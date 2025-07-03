@@ -1,9 +1,8 @@
-# Ignore build outputs
+# Build artifacts
 bin/
 obj/
-TestResults/
 *.user
 *.vs/
-# Tools
-/dotnet-install.sh
-/packages-microsoft-prod.deb
+TestResults/
+packages-microsoft-prod.deb
+dotnet-install.sh
