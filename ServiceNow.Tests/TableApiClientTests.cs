@@ -1,6 +1,7 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
+using ServiceNow.Extensions;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -22,12 +23,22 @@ public class TableApiClientTests {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("{\"SysId\":\"1\"}");
 
-        var record = await client.GetRecordAsync<TaskRecord>("task", "1", CancellationToken.None);
+        var record = await client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
         Assert.Equal("/api/now/table/task/1", mock.LastRelativeUrl);
         Assert.NotNull(record);
         Assert.Equal("1", record!.SysId);
+    }
+
+    [Fact]
+    public async Task GetRecordAsync_WithFilters_AppendsQueryString() {
+        var (client, mock) = Create();
+        var filters = new Dictionary<string, string?> { ["fields"] = "sys_id" };
+
+        await client.GetRecordAsync<TaskRecord>("task", "1", filters, CancellationToken.None);
+
+        Assert.Equal("/api/now/table/task/1?" + filters.ToQueryString(), mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -61,6 +72,19 @@ public class TableApiClientTests {
     }
 
     [Fact]
+    public async Task ListRecordsAsync_SendsGetWithFilters() {
+        var (client, mock) = Create();
+        mock.Response.Content = new StringContent("[]");
+        var filters = new Dictionary<string, string?> { ["state"] = "1" };
+
+        var records = await client.ListRecordsAsync<TaskRecord>("task", filters, CancellationToken.None);
+
+        Assert.Equal(HttpMethod.Get, mock.LastMethod);
+        Assert.Equal("/api/now/table/task?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.NotNull(records);
+    }
+
+    [Fact]
     public async Task GetRecordAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
         var http = new HttpClient(handler);
@@ -74,7 +98,7 @@ public class TableApiClientTests {
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
-        await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetRecordAsync<TaskRecord>("task", "1", cts.Token));
+        await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetRecordAsync<TaskRecord>("task", "1", null, cts.Token));
         Assert.True(cts.IsCancellationRequested);
     }
 }

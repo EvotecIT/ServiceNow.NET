@@ -6,6 +6,7 @@ using System.CommandLine.Invocation;
 using System.Net.Http;
 using System.Text.Json;
 using ServiceNow.Utilities;
+using System.Collections.Generic;
 
 var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow instance base URL") { IsRequired = true };
 var usernameOption = new Option<string>("--username", description: "Username") { IsRequired = true };
@@ -20,14 +21,18 @@ root.AddGlobalOption(userAgentOption);
 
 var tableArg = new Argument<string>("table", "Table name");
 var sysIdArg = new Argument<string>("sysId", "Record sys_id");
+var filterOpt = new Option<string[]>("--filter", "Query filters as key=value pairs") { AllowMultipleArgumentsPerToken = true };
 var getCmd = new Command("get-record", "Retrieve a record")
 {
     tableArg,
-    sysIdArg
+    sysIdArg,
+    filterOpt
 };
 getCmd.SetHandler(async (InvocationContext ctx) => {
     var table = ctx.ParseResult.GetValueForArgument(tableArg);
     var sysId = ctx.ParseResult.GetValueForArgument(sysIdArg);
+    var filterPairs = ctx.ParseResult.GetValueForOption(filterOpt) ?? Array.Empty<string>();
+    var filters = ParseFilters(filterPairs);
     var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
     var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
     var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
@@ -38,7 +43,7 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
     using var http = new HttpClient();
     IServiceNowClient client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
-    var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, cancellationToken).ConfigureAwait(false);
+    var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, filters, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(
         record,
         new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
@@ -101,4 +106,52 @@ root.AddCommand(getCmd);
 root.AddCommand(createCmd);
 root.AddCommand(updateCmd);
 
+var listTableArg = new Argument<string>("table", "Table name");
+var listCmd = new Command("list-records", "List records")
+{
+    listTableArg,
+    filterOpt
+};
+listCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(listTableArg);
+    var filterPairs = ctx.ParseResult.GetValueForOption(filterOpt) ?? Array.Empty<string>();
+    var filters = ParseFilters(filterPairs);
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    using var http = new HttpClient();
+    IServiceNowClient client = new ServiceNowClient(http, settings);
+    var tableClient = new TableApiClient(client);
+    var records = await tableClient.ListRecordsAsync<TaskRecord>(table, filters, cancellationToken).ConfigureAwait(false);
+    Console.WriteLine(JsonSerializer.Serialize(
+        records,
+        new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+});
+
+root.AddCommand(listCmd);
+
 return await root.InvokeAsync(args);
+
+static Dictionary<string, string?> ParseFilters(IEnumerable<string> pairs) {
+    var dict = new Dictionary<string, string?>();
+    foreach (var pair in pairs) {
+        if (string.IsNullOrEmpty(pair)) {
+            continue;
+        }
+
+        var idx = pair.IndexOf('=');
+        if (idx < 0) {
+            dict[pair] = null;
+            continue;
+        }
+
+        var key = pair.Substring(0, idx);
+        var value = pair.Substring(idx + 1);
+        dict[key] = value;
+    }
+    return dict;
+}
