@@ -1,6 +1,6 @@
-using System.Management.Automation;
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
+using System.Management.Automation;
 using System.Text.Json;
 
 #if NET8_0_OR_GREATER
@@ -8,8 +8,7 @@ using System.Text.Json;
 namespace ServiceNow.PowerShell;
 
 [Cmdlet(VerbsCommon.New, "ServiceNowRecord")]
-public class NewServiceNowRecord : PSCmdlet
-{
+public class NewServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
 
@@ -25,8 +24,7 @@ public class NewServiceNowRecord : PSCmdlet
     [Parameter(Mandatory = true)]
     public string Data { get; set; } = string.Empty;
 
-    protected override void ProcessRecord()
-    {
+    protected override void ProcessRecord() {
         using var http = new HttpClient();
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         var client = new ServiceNowClient(http, settings);

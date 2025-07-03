@@ -1,19 +1,16 @@
+using ServiceNow.Clients;
+using ServiceNow.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using ServiceNow.Clients;
-using ServiceNow.Configuration;
 
 namespace ServiceNow.Tests;
 
-public class ServiceNowClientTests
-{
-    private static ServiceNowClient CreateClient(MockHttpMessageHandler handler)
-    {
+public class ServiceNowClientTests {
+    private static ServiceNowClient CreateClient(MockHttpMessageHandler handler) {
         var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings
-        {
+        var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass",
@@ -23,12 +20,10 @@ public class ServiceNowClientTests
     }
 
     [Fact]
-    public void Constructor_SetsBaseAddressAndHeaders()
-    {
+    public void Constructor_SetsBaseAddressAndHeaders() {
         var handler = new MockHttpMessageHandler();
         var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings
-        {
+        var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass",
@@ -45,8 +40,7 @@ public class ServiceNowClientTests
     }
 
     [Fact]
-    public async Task GetAsync_SendsGetRequest()
-    {
+    public async Task GetAsync_SendsGetRequest() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
@@ -57,8 +51,7 @@ public class ServiceNowClientTests
     }
 
     [Fact]
-    public async Task PostAsync_SendsPostRequestWithJson()
-    {
+    public async Task PostAsync_SendsPostRequestWithJson() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
@@ -71,8 +64,7 @@ public class ServiceNowClientTests
     }
 
     [Fact]
-    public async Task PutAsync_SendsPutRequestWithJson()
-    {
+    public async Task PutAsync_SendsPutRequestWithJson() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
@@ -85,8 +77,7 @@ public class ServiceNowClientTests
     }
 
     [Fact]
-    public async Task DeleteAsync_SendsDeleteRequest()
-    {
+    public async Task DeleteAsync_SendsDeleteRequest() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 

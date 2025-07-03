@@ -3,8 +3,7 @@ namespace ServiceNow.Enums;
 /// <summary>
 /// Common ServiceNow roles.
 /// </summary>
-public enum ServiceNowRole
-{
+public enum ServiceNowRole {
     Admin,
     ITIL,
     Approver,

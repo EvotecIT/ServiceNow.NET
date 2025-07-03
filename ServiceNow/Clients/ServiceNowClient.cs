@@ -1,21 +1,19 @@
+using ServiceNow.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using ServiceNow.Configuration;
 
 namespace ServiceNow.Clients;
 
 /// <summary>
 /// Basic client for interacting with the ServiceNow REST API.
 /// </summary>
-public class ServiceNowClient
-{
+public class ServiceNowClient {
     private readonly HttpClient _httpClient;
     private readonly ServiceNowSettings _settings;
 
-    public ServiceNowClient(HttpClient httpClient, ServiceNowSettings settings)
-    {
+    public ServiceNowClient(HttpClient httpClient, ServiceNowSettings settings) {
         _httpClient = httpClient;
         _settings = settings;
 
@@ -29,14 +27,12 @@ public class ServiceNowClient
     public async Task<HttpResponseMessage> GetAsync(string relativeUrl)
         => await _httpClient.GetAsync(relativeUrl).ConfigureAwait(false);
 
-    public async Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload)
-    {
+    public async Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload) {
         var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
         return await _httpClient.PostAsync(relativeUrl, content).ConfigureAwait(false);
     }
 
-    public async Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload)
-    {
+    public async Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload) {
         var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
         return await _httpClient.PutAsync(relativeUrl, content).ConfigureAwait(false);
     }

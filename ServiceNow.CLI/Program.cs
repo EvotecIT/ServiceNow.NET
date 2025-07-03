@@ -1,8 +1,8 @@
-using System.CommandLine;
 using ServiceNow.Clients;
-using System.Net.Http;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
+using System.CommandLine;
+using System.Net.Http;
 using System.Text.Json;
 
 var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow instance base URL") { IsRequired = true };
@@ -23,8 +23,7 @@ var getCmd = new Command("get-record", "Retrieve a record")
     tableArg,
     sysIdArg
 };
-getCmd.SetHandler(async (string table, string sysId, string baseUrl, string username, string password, string userAgent) =>
-{
+getCmd.SetHandler(async (string table, string sysId, string baseUrl, string username, string password, string userAgent) => {
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
@@ -40,8 +39,7 @@ var createCmd = new Command("create-record", "Create a record")
     createTableArg,
     createDataOpt
 };
-createCmd.SetHandler(async (string table, string data, string baseUrl, string username, string password, string userAgent) =>
-{
+createCmd.SetHandler(async (string table, string data, string baseUrl, string username, string password, string userAgent) => {
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
@@ -60,8 +58,7 @@ var updateCmd = new Command("update-record", "Update a record")
     updateSysIdArg,
     updateDataOpt
 };
-updateCmd.SetHandler(async (string table, string sysId, string data, string baseUrl, string username, string password, string userAgent) =>
-{
+updateCmd.SetHandler(async (string table, string sysId, string data, string baseUrl, string username, string password, string userAgent) => {
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);

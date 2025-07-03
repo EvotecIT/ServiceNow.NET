@@ -6,8 +6,7 @@ namespace ServiceNow.Extensions;
 /// <summary>
 /// Extension methods that expose a fluent API for <see cref="ServiceNowClient"/>.
 /// </summary>
-public static class ServiceNowClientFluentExtensions
-{
+public static class ServiceNowClientFluentExtensions {
     /// <summary>
     /// Starts a fluent call chain for working with a specific table.
     /// </summary>

@@ -2,20 +2,15 @@ using System.Text;
 
 namespace ServiceNow.Extensions;
 
-public static class QueryStringExtensions
-{
-    public static string ToQueryString(this IDictionary<string, string?> parameters)
-    {
+public static class QueryStringExtensions {
+    public static string ToQueryString(this IDictionary<string, string?> parameters) {
         var builder = new StringBuilder();
-        foreach (var kvp in parameters)
-        {
-            if (kvp.Value is null)
-            {
+        foreach (var kvp in parameters) {
+            if (kvp.Value is null) {
                 continue;
             }
 
-            if (builder.Length > 0)
-            {
+            if (builder.Length > 0) {
                 builder.Append('&');
             }
 

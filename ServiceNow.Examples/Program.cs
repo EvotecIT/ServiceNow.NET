@@ -4,8 +4,7 @@ using ServiceNow.Models;
 using System.Net.Http;
 using System.Text.Json;
 
-var settings = new ServiceNowSettings
-{
+var settings = new ServiceNowSettings {
     BaseUrl = "https://instance.service-now.com",
     Username = "admin",
     Password = "password"

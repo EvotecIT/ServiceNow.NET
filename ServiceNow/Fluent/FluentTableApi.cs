@@ -5,8 +5,7 @@ namespace ServiceNow.Fluent;
 /// <summary>
 /// Provides a fluent interface for working with the ServiceNow Table API.
 /// </summary>
-public class FluentTableApi
-{
+public class FluentTableApi {
     private readonly TableApiClient _client;
     private readonly string _table;
 
@@ -15,8 +14,7 @@ public class FluentTableApi
     /// </summary>
     /// <param name="client">Underlying ServiceNow client.</param>
     /// <param name="table">Table name.</param>
-    public FluentTableApi(ServiceNowClient client, string table)
-    {
+    public FluentTableApi(ServiceNowClient client, string table) {
         _client = new TableApiClient(client);
         _table = table;
     }
