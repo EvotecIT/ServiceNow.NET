@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using ServiceNow.Utilities;
 
 namespace ServiceNow.Clients;
 
@@ -28,12 +29,12 @@ public class ServiceNowClient {
         => await _httpClient.GetAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
 
     public async Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
-        var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonSerializer.Serialize(payload, ServiceNowJson.Default), Encoding.UTF8, "application/json");
         return await _httpClient.PostAsync(relativeUrl, content, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
-        var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonSerializer.Serialize(payload, ServiceNowJson.Default), Encoding.UTF8, "application/json");
         return await _httpClient.PutAsync(relativeUrl, content, cancellationToken).ConfigureAwait(false);
     }
 

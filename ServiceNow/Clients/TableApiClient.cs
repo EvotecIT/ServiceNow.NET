@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Text.Json;
+using ServiceNow.Utilities;
 
 namespace ServiceNow.Clients;
 
@@ -15,7 +16,7 @@ public class TableApiClient {
         var response = await _client.GetAsync($"/api/now/table/{table}/{sysId}", cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        return JsonSerializer.Deserialize<T>(json);
+        return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
 
     public async Task CreateRecordAsync<T>(string table, T record, CancellationToken cancellationToken = default) {
