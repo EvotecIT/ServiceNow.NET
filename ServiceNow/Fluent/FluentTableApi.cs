@@ -27,24 +27,24 @@ public class FluentTableApi {
     /// <summary>
     /// Retrieves a record from the table.
     /// </summary>
-    public async Task<T?> GetAsync<T>(string sysId)
-        => await _client.GetRecordAsync<T>(_table, sysId).ConfigureAwait(false);
+    public async Task<T?> GetAsync<T>(string sysId, CancellationToken cancellationToken = default)
+        => await _client.GetRecordAsync<T>(_table, sysId, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Creates a record in the table.
     /// </summary>
-    public async Task CreateAsync<T>(T record)
-        => await _client.CreateRecordAsync(_table, record).ConfigureAwait(false);
+    public async Task CreateAsync<T>(T record, CancellationToken cancellationToken = default)
+        => await _client.CreateRecordAsync(_table, record, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Updates a record in the table.
     /// </summary>
-    public async Task UpdateAsync<T>(string sysId, T record)
-        => await _client.UpdateRecordAsync(_table, sysId, record).ConfigureAwait(false);
+    public async Task UpdateAsync<T>(string sysId, T record, CancellationToken cancellationToken = default)
+        => await _client.UpdateRecordAsync(_table, sysId, record, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Deletes a record from the table.
     /// </summary>
-    public async Task DeleteAsync(string sysId)
-        => await _client.DeleteRecordAsync(_table, sysId).ConfigureAwait(false);
+    public async Task DeleteAsync(string sysId, CancellationToken cancellationToken = default)
+        => await _client.DeleteRecordAsync(_table, sysId, cancellationToken).ConfigureAwait(false);
 }

@@ -44,7 +44,7 @@ public class ServiceNowClientTests {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
-        await client.GetAsync("/path");
+        await client.GetAsync("/path", CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
@@ -55,7 +55,7 @@ public class ServiceNowClientTests {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
-        await client.PostAsync("/path", new { Name = "foo" });
+        await client.PostAsync("/path", new { Name = "foo" }, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Post, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
@@ -68,7 +68,7 @@ public class ServiceNowClientTests {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
-        await client.PutAsync("/path", new { Name = "bar" });
+        await client.PutAsync("/path", new { Name = "bar" }, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Put, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
@@ -81,9 +81,27 @@ public class ServiceNowClientTests {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);
 
-        await client.DeleteAsync("/path");
+        await client.DeleteAsync("/path", CancellationToken.None);
 
         Assert.Equal(HttpMethod.Delete, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
+    }
+
+    [Fact]
+    public async Task GetAsync_CancelledToken_Throws() {
+        var handler = new CancelMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass",
+            UserAgent = "TestAgent"
+        };
+        var client = new ServiceNowClient(http, settings);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetAsync("/path", cts.Token));
+        Assert.True(cts.IsCancellationRequested);
     }
 }
