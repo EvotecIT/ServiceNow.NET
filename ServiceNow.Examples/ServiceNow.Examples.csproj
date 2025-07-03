@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/ServiceNow/ServiceNow.csproj" />
+    <ProjectReference Include="../ServiceNow/ServiceNow.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,9 @@
+# Ignore build outputs
+bin/
+obj/
+TestResults/
+*.user
+*.vs/
+# Tools
+/dotnet-install.sh
+/packages-microsoft-prod.deb
