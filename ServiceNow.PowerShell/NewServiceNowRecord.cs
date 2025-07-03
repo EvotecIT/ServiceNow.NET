@@ -8,6 +8,9 @@ using System.Text.Json;
 namespace ServiceNow.PowerShell;
 
 [Cmdlet(VerbsCommon.New, "ServiceNowRecord")]
+/// <summary>
+/// PowerShell cmdlet for creating a new ServiceNow record.
+/// </summary>
 public class NewServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;

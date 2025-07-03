@@ -9,6 +9,9 @@ using System.Text.Json;
 namespace ServiceNow.PowerShell;
 
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecord")]
+/// <summary>
+/// PowerShell cmdlet for retrieving a ServiceNow record.
+/// </summary>
 public class GetServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
