@@ -16,7 +16,7 @@ var client = new ServiceNowClient(http, settings);
 var tableClient = new TableApiClient(client);
 
 Console.WriteLine("Retrieving record...");
-var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", CancellationToken.None);
+var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", null, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
     record,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));

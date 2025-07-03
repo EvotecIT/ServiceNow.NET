@@ -30,7 +30,7 @@ public class GetServiceNowRecord : PSCmdlet {
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         IServiceNowClient client = new ServiceNowClient(http, settings);
         var tableClient = new TableApiClient(client);
-        var record = tableClient.GetRecordAsync<TaskRecord>(Table, SysId, CancellationToken.None).GetAwaiter().GetResult();
+        var record = tableClient.GetRecordAsync<TaskRecord>(Table, SysId, null, CancellationToken.None).GetAwaiter().GetResult();
         WriteObject(record);
     }
 }

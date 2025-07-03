@@ -1,4 +1,5 @@
 using ServiceNow.Clients;
+using System.Collections.Generic;
 
 namespace ServiceNow.Fluent;
 
@@ -27,8 +28,14 @@ public class FluentTableApi {
     /// <summary>
     /// Retrieves a record from the table.
     /// </summary>
-    public async Task<T?> GetAsync<T>(string sysId, CancellationToken cancellationToken = default)
-        => await _client.GetRecordAsync<T>(_table, sysId, cancellationToken).ConfigureAwait(false);
+    public async Task<T?> GetAsync<T>(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+        => await _client.GetRecordAsync<T>(_table, sysId, filters, cancellationToken).ConfigureAwait(false);
+
+    /// <summary>
+    /// Lists records from the table.
+    /// </summary>
+    public async Task<List<T>> ListAsync<T>(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+        => await _client.ListRecordsAsync<T>(_table, filters, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Creates a record in the table.
