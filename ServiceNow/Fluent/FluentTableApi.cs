@@ -14,7 +14,7 @@ public class FluentTableApi {
     /// </summary>
     /// <param name="client">Underlying ServiceNow client.</param>
     /// <param name="table">Table name.</param>
-    public FluentTableApi(ServiceNowClient client, string table) {
+    public FluentTableApi(IServiceNowClient client, string table) {
         _client = new TableApiClient(client);
         _table = table;
     }

@@ -35,7 +35,7 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
-    var client = new ServiceNowClient(http, settings);
+    IServiceNowClient client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { WriteIndented = true }));
@@ -59,7 +59,7 @@ createCmd.SetHandler(async (InvocationContext ctx) => {
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
-    var client = new ServiceNowClient(http, settings);
+    IServiceNowClient client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
     await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
@@ -87,7 +87,7 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
-    var client = new ServiceNowClient(http, settings);
+    IServiceNowClient client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
     await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);

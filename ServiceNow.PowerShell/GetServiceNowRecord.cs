@@ -28,7 +28,7 @@ public class GetServiceNowRecord : PSCmdlet {
     protected override void ProcessRecord() {
         using var http = new HttpClient();
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
-        var client = new ServiceNowClient(http, settings);
+        IServiceNowClient client = new ServiceNowClient(http, settings);
         var tableClient = new TableApiClient(client);
         var record = tableClient.GetRecordAsync<TaskRecord>(Table, SysId, CancellationToken.None).GetAwaiter().GetResult();
         WriteObject(record);

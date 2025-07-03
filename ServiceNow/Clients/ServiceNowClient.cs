@@ -9,7 +9,7 @@ namespace ServiceNow.Clients;
 /// <summary>
 /// Basic client for interacting with the ServiceNow REST API.
 /// </summary>
-public class ServiceNowClient {
+public class ServiceNowClient : IServiceNowClient {
     private readonly HttpClient _httpClient;
     private readonly ServiceNowSettings _settings;
 
