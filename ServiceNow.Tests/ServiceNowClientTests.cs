@@ -66,9 +66,8 @@ public class ServiceNowClientTests
 
         Assert.Equal(HttpMethod.Post, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
-        var content = await handler.LastRequest!.Content!.ReadAsStringAsync();
-        Assert.Equal("{\"Name\":\"foo\"}", content);
-        Assert.Equal("application/json", handler.LastRequest.Content?.Headers.ContentType?.MediaType);
+        Assert.Equal("{\"Name\":\"foo\"}", handler.RequestContent);
+        Assert.Equal("application/json", handler.LastRequest!.Content?.Headers.ContentType?.MediaType);
     }
 
     [Fact]
@@ -81,9 +80,8 @@ public class ServiceNowClientTests
 
         Assert.Equal(HttpMethod.Put, handler.LastRequest?.Method);
         Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
-        var content = await handler.LastRequest!.Content!.ReadAsStringAsync();
-        Assert.Equal("{\"Name\":\"bar\"}", content);
-        Assert.Equal("application/json", handler.LastRequest.Content?.Headers.ContentType?.MediaType);
+        Assert.Equal("{\"Name\":\"bar\"}", handler.RequestContent);
+        Assert.Equal("application/json", handler.LastRequest!.Content?.Headers.ContentType?.MediaType);
     }
 
     [Fact]
