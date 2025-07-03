@@ -1,6 +1,8 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Management.Automation;
 using System.Text.Json;
 
@@ -26,10 +28,11 @@ public class GetServiceNowRecord : PSCmdlet {
     public string SysId { get; set; } = string.Empty;
 
     protected override void ProcessRecord() {
-        using var http = new HttpClient();
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
-        IServiceNowClient client = new ServiceNowClient(http, settings);
-        var tableClient = new TableApiClient(client);
+        var services = new ServiceCollection();
+        services.AddServiceNow(settings);
+        using var provider = services.BuildServiceProvider();
+        var tableClient = provider.GetRequiredService<TableApiClient>();
         var record = tableClient.GetRecordAsync<TaskRecord>(Table, SysId, null, CancellationToken.None).GetAwaiter().GetResult();
         WriteObject(record);
     }

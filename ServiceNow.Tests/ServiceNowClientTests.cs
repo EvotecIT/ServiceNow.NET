@@ -40,6 +40,24 @@ public class ServiceNowClientTests {
     }
 
     [Fact]
+    public void Constructor_NullBaseUrl_Throws() {
+        var handler = new MockHttpMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings { Username = "user", Password = "pass" };
+
+        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings));
+    }
+
+    [Fact]
+    public void Constructor_EmptyBaseUrl_Throws() {
+        var handler = new MockHttpMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings { BaseUrl = string.Empty, Username = "user", Password = "pass" };
+
+        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings));
+    }
+
+    [Fact]
     public async Task GetAsync_SendsGetRequest() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);

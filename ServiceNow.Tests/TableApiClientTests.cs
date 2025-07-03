@@ -85,6 +85,20 @@ public class TableApiClientTests {
     }
 
     [Fact]
+    public async Task GetRecordAsync_ErrorResponse_ThrowsServiceNowException() {
+        var mock = new MockServiceNowClient {
+            Response = new HttpResponseMessage(HttpStatusCode.BadRequest) {
+                Content = new StringContent("bad")
+            }
+        };
+        var client = new TableApiClient(mock);
+
+        var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None));
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+        Assert.Equal("bad", ex.Content);
+    }
+
+    [Fact]
     public async Task GetRecordAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
         var http = new HttpClient(handler);
