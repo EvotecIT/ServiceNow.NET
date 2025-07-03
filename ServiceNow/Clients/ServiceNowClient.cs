@@ -24,19 +24,19 @@ public class ServiceNowClient {
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(settings.UserAgent);
     }
 
-    public async Task<HttpResponseMessage> GetAsync(string relativeUrl)
-        => await _httpClient.GetAsync(relativeUrl).ConfigureAwait(false);
+    public async Task<HttpResponseMessage> GetAsync(string relativeUrl, CancellationToken cancellationToken = default)
+        => await _httpClient.GetAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
 
-    public async Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload) {
+    public async Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
         var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        return await _httpClient.PostAsync(relativeUrl, content).ConfigureAwait(false);
+        return await _httpClient.PostAsync(relativeUrl, content, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload) {
+    public async Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
         var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-        return await _httpClient.PutAsync(relativeUrl, content).ConfigureAwait(false);
+        return await _httpClient.PutAsync(relativeUrl, content, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<HttpResponseMessage> DeleteAsync(string relativeUrl)
-        => await _httpClient.DeleteAsync(relativeUrl).ConfigureAwait(false);
+    public async Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default)
+        => await _httpClient.DeleteAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
 }

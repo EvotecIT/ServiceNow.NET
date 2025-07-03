@@ -15,10 +15,10 @@ var client = new ServiceNowClient(http, settings);
 var tableClient = new TableApiClient(client);
 
 Console.WriteLine("Retrieving record...");
-var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id");
+var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { WriteIndented = true }));
 
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };
-await tableClient.CreateRecordAsync("incident", payload);
+await tableClient.CreateRecordAsync("incident", payload, CancellationToken.None);
 Console.WriteLine("Done");

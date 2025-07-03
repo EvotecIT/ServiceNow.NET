@@ -2,6 +2,7 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
 using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -23,14 +24,22 @@ var getCmd = new Command("get-record", "Retrieve a record")
     tableArg,
     sysIdArg
 };
-getCmd.SetHandler(async (string table, string sysId, string baseUrl, string username, string password, string userAgent) => {
+getCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(tableArg);
+    var sysId = ctx.ParseResult.GetValueForArgument(sysIdArg);
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
-    var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId).ConfigureAwait(false);
+    var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { WriteIndented = true }));
-}, tableArg, sysIdArg, baseUrlOption, usernameOption, passwordOption, userAgentOption);
+});
 
 var createTableArg = new Argument<string>("table", "Table name");
 var createDataOpt = new Option<string>("--data", "JSON payload") { IsRequired = true };
@@ -39,15 +48,23 @@ var createCmd = new Command("create-record", "Create a record")
     createTableArg,
     createDataOpt
 };
-createCmd.SetHandler(async (string table, string data, string baseUrl, string username, string password, string userAgent) => {
+createCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(createTableArg);
+    var data = ctx.ParseResult.GetValueForOption(createDataOpt)!;
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
-    await tableClient.CreateRecordAsync(table, record).ConfigureAwait(false);
+    await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record created.");
-}, createTableArg, createDataOpt, baseUrlOption, usernameOption, passwordOption, userAgentOption);
+});
 
 var updateTableArg = new Argument<string>("table", "Table name");
 var updateSysIdArg = new Argument<string>("sysId", "Record sys_id");
@@ -58,15 +75,24 @@ var updateCmd = new Command("update-record", "Update a record")
     updateSysIdArg,
     updateDataOpt
 };
-updateCmd.SetHandler(async (string table, string sysId, string data, string baseUrl, string username, string password, string userAgent) => {
+updateCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(updateTableArg);
+    var sysId = ctx.ParseResult.GetValueForArgument(updateSysIdArg);
+    var data = ctx.ParseResult.GetValueForOption(updateDataOpt)!;
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
-    await tableClient.UpdateRecordAsync(table, sysId, record).ConfigureAwait(false);
+    await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record updated.");
-}, updateTableArg, updateSysIdArg, updateDataOpt, baseUrlOption, usernameOption, passwordOption, userAgentOption);
+});
 
 root.AddCommand(getCmd);
 root.AddCommand(createCmd);

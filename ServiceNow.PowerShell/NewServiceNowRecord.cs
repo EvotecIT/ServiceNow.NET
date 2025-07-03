@@ -30,7 +30,7 @@ public class NewServiceNowRecord : PSCmdlet {
         var client = new ServiceNowClient(http, settings);
         var tableClient = new TableApiClient(client);
         var payload = JsonSerializer.Deserialize<Dictionary<string, string?>>(Data) ?? new();
-        tableClient.CreateRecordAsync(Table, payload).GetAwaiter().GetResult();
+        tableClient.CreateRecordAsync(Table, payload, CancellationToken.None).GetAwaiter().GetResult();
     }
 }
 #endif

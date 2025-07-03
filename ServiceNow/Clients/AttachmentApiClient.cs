@@ -12,8 +12,8 @@ public class AttachmentApiClient {
 
     public AttachmentApiClient(ServiceNowClient client) => _client = client;
 
-    public async Task<HttpResponseMessage> GetAttachmentAsync(string sysId)
-        => await _client.GetAsync($"/api/now/attachment/{sysId}").ConfigureAwait(false);
+    public async Task<HttpResponseMessage> GetAttachmentAsync(string sysId, CancellationToken cancellationToken = default)
+        => await _client.GetAsync($"/api/now/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
 
     public async Task UploadAttachmentAsync(string table, string sysId, Stream file, string fileName) {
         using var content = new MultipartFormDataContent();
@@ -21,12 +21,12 @@ public class AttachmentApiClient {
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         content.Add(streamContent, "file", fileName);
 
-        var response = await _client.PostAsync($"/api/now/attachment/file?table_name={table}&table_sys_id={sysId}", content).ConfigureAwait(false);
+        var response = await _client.PostAsync($"/api/now/attachment/file?table_name={table}&table_sys_id={sysId}", content, CancellationToken.None).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteAttachmentAsync(string sysId) {
-        var response = await _client.DeleteAsync($"/api/now/attachment/{sysId}").ConfigureAwait(false);
+    public async Task DeleteAttachmentAsync(string sysId, CancellationToken cancellationToken = default) {
+        var response = await _client.DeleteAsync($"/api/now/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 }
