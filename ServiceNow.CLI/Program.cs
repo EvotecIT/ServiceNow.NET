@@ -5,6 +5,7 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Net.Http;
 using System.Text.Json;
+using ServiceNow.Utilities;
 
 var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow instance base URL") { IsRequired = true };
 var usernameOption = new Option<string>("--username", description: "Username") { IsRequired = true };
@@ -38,7 +39,9 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
     var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, cancellationToken).ConfigureAwait(false);
-    Console.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { WriteIndented = true }));
+    Console.WriteLine(JsonSerializer.Serialize(
+        record,
+        new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 });
 
 var createTableArg = new Argument<string>("table", "Table name");
@@ -61,7 +64,7 @@ createCmd.SetHandler(async (InvocationContext ctx) => {
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
-    var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
+    var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record created.");
 });
@@ -89,7 +92,7 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
     using var http = new HttpClient();
     var client = new ServiceNowClient(http, settings);
     var tableClient = new TableApiClient(client);
-    var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data) ?? new();
+    var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record updated.");
 });

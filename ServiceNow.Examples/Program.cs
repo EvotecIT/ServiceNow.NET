@@ -3,6 +3,7 @@ using ServiceNow.Configuration;
 using ServiceNow.Models;
 using System.Net.Http;
 using System.Text.Json;
+using ServiceNow.Utilities;
 
 var settings = new ServiceNowSettings {
     BaseUrl = "https://instance.service-now.com",
@@ -16,7 +17,9 @@ var tableClient = new TableApiClient(client);
 
 Console.WriteLine("Retrieving record...");
 var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", CancellationToken.None);
-Console.WriteLine(JsonSerializer.Serialize(record, new JsonSerializerOptions { WriteIndented = true }));
+Console.WriteLine(JsonSerializer.Serialize(
+    record,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };

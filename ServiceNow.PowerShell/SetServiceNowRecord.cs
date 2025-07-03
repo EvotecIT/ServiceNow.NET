@@ -2,6 +2,7 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.Management.Automation;
 using System.Text.Json;
+using ServiceNow.Utilities;
 
 #if NET8_0_OR_GREATER
 
@@ -32,7 +33,7 @@ public class SetServiceNowRecord : PSCmdlet {
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         var client = new ServiceNowClient(http, settings);
         var tableClient = new TableApiClient(client);
-        var payload = JsonSerializer.Deserialize<Dictionary<string, string?>>(Data) ?? new();
+        var payload = JsonSerializer.Deserialize<Dictionary<string, string?>>(Data, ServiceNowJson.Default) ?? new();
         tableClient.UpdateRecordAsync(Table, SysId, payload, CancellationToken.None).GetAwaiter().GetResult();
     }
 }
