@@ -1,5 +1,7 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Management.Automation;
 using System.Text.Json;
 using ServiceNow.Utilities;
@@ -26,10 +28,11 @@ public class NewServiceNowRecord : PSCmdlet {
     public string Data { get; set; } = string.Empty;
 
     protected override void ProcessRecord() {
-        using var http = new HttpClient();
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
-        IServiceNowClient client = new ServiceNowClient(http, settings);
-        var tableClient = new TableApiClient(client);
+        var services = new ServiceCollection();
+        services.AddServiceNow(settings);
+        using var provider = services.BuildServiceProvider();
+        var tableClient = provider.GetRequiredService<TableApiClient>();
         var payload = JsonSerializer.Deserialize<Dictionary<string, string?>>(Data, ServiceNowJson.Default) ?? new();
         tableClient.CreateRecordAsync(Table, payload, CancellationToken.None).GetAwaiter().GetResult();
     }

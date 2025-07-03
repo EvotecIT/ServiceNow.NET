@@ -3,7 +3,8 @@ using ServiceNow.Configuration;
 using ServiceNow.Models;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Text.Json;
 using ServiceNow.Utilities;
 using System.Collections.Generic;
@@ -40,9 +41,10 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
-    using var http = new HttpClient();
-    IServiceNowClient client = new ServiceNowClient(http, settings);
-    var tableClient = new TableApiClient(client);
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, filters, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(
         record,
@@ -66,9 +68,10 @@ createCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
-    using var http = new HttpClient();
-    IServiceNowClient client = new ServiceNowClient(http, settings);
-    var tableClient = new TableApiClient(client);
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record created.");
@@ -94,9 +97,10 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
-    using var http = new HttpClient();
-    IServiceNowClient client = new ServiceNowClient(http, settings);
-    var tableClient = new TableApiClient(client);
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
     Console.WriteLine("Record updated.");
@@ -123,9 +127,10 @@ listCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
-    using var http = new HttpClient();
-    IServiceNowClient client = new ServiceNowClient(http, settings);
-    var tableClient = new TableApiClient(client);
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var tableClient = provider.GetRequiredService<TableApiClient>();
     var records = await tableClient.ListRecordsAsync<TaskRecord>(table, filters, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(
         records,

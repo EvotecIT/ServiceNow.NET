@@ -1,7 +1,8 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
-using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Text.Json;
 using ServiceNow.Utilities;
 
@@ -11,9 +12,10 @@ var settings = new ServiceNowSettings {
     Password = "password"
 };
 
-using var http = new HttpClient();
-var client = new ServiceNowClient(http, settings);
-var tableClient = new TableApiClient(client);
+var services = new ServiceCollection();
+services.AddServiceNow(settings);
+using var provider = services.BuildServiceProvider();
+var tableClient = provider.GetRequiredService<TableApiClient>();
 
 Console.WriteLine("Retrieving record...");
 var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", null, CancellationToken.None);

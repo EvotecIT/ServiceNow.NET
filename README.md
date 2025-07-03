@@ -19,6 +19,26 @@ This repository targets the following frameworks:
 - .NET Framework 4.7.2
 - .NET Standard 2.0 (library only)
 
+## Configuration
+
+`ServiceNowSettings` requires `BaseUrl`, `Username` and `Password` to be provided when creating a `ServiceNowClient`.
+An `ArgumentException` is thrown if `BaseUrl` is missing.
+
+### Using Dependency Injection
+
+You can register the clients with `IServiceCollection`:
+
+```csharp
+var services = new ServiceCollection();
+services.AddServiceNow(new ServiceNowSettings {
+    BaseUrl = "https://instance.service-now.com",
+    Username = "admin",
+    Password = "password"
+});
+var provider = services.BuildServiceProvider();
+var tableClient = provider.GetRequiredService<TableApiClient>();
+```
+
 ## CLI Usage
 
 The command-line tool is in the `ServiceNow.CLI` project. Example:
@@ -28,6 +48,9 @@ The command-line tool is in the `ServiceNow.CLI` project. Example:
 dotnet run --project ServiceNow.CLI -- --base-url https://instance.service-now.com \
     --username admin --password password get-record incident abc123
 ```
+
+The CLI builds a service provider and registers typed clients via `AddHttpClient`.
+Failed requests throw `ServiceNowException` containing the status code and body.
 
 ## PowerShell Module Usage
 
@@ -40,3 +63,5 @@ Import-Module ./ServiceNow.PowerShell/bin/Debug/net8.0/ServiceNow.PowerShell.dll
 # Retrieve a record
 Get-ServiceNowRecord -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident -SysId abc123
 ```
+
+Like the CLI, the PowerShell module uses dependency injection with `AddHttpClient` and throws `ServiceNowException` on failure.
