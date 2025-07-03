@@ -31,7 +31,7 @@ public class SetServiceNowRecord : PSCmdlet {
     protected override void ProcessRecord() {
         using var http = new HttpClient();
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
-        var client = new ServiceNowClient(http, settings);
+        IServiceNowClient client = new ServiceNowClient(http, settings);
         var tableClient = new TableApiClient(client);
         var payload = JsonSerializer.Deserialize<Dictionary<string, string?>>(Data, ServiceNowJson.Default) ?? new();
         tableClient.UpdateRecordAsync(Table, SysId, payload, CancellationToken.None).GetAwaiter().GetResult();

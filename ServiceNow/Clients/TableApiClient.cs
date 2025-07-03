@@ -1,4 +1,3 @@
-using System.Net.Http;
 using System.Text.Json;
 using ServiceNow.Utilities;
 
@@ -8,9 +7,9 @@ namespace ServiceNow.Clients;
 /// Client for interacting with the ServiceNow Table API.
 /// </summary>
 public class TableApiClient {
-    private readonly ServiceNowClient _client;
+    private readonly IServiceNowClient _client;
 
-    public TableApiClient(ServiceNowClient client) => _client = client;
+    public TableApiClient(IServiceNowClient client) => _client = client;
 
     public async Task<T?> GetRecordAsync<T>(string table, string sysId, CancellationToken cancellationToken = default) {
         var response = await _client.GetAsync($"/api/now/table/{table}/{sysId}", cancellationToken).ConfigureAwait(false);
