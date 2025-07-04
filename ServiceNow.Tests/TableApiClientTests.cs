@@ -125,4 +125,30 @@ public class TableApiClientTests {
         await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetRecordAsync<TaskRecord>("task", "1", null, cts.Token));
         Assert.True(cts.IsCancellationRequested);
     }
+
+    [Fact]
+    public async Task GetRecordsAsync_SendsLimitAndOffset() {
+        var (client, mock) = Create();
+        mock.Response.Content = new StringContent("[]");
+
+        var records = await client.GetRecordsAsync<TaskRecord>("task", 5, 10, CancellationToken.None);
+
+        Assert.Equal(HttpMethod.Get, mock.LastMethod);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=5&sysparm_offset=10", mock.LastRelativeUrl);
+        Assert.NotNull(records);
+    }
+
+    [Fact]
+    public async Task GetRecordsAsync_ErrorResponse_ThrowsServiceNowException() {
+        var mock = new MockServiceNowClient {
+            Response = new HttpResponseMessage(HttpStatusCode.BadRequest) {
+                Content = new StringContent("bad")
+            }
+        };
+        var client = new TableApiClient(mock, new ServiceNowSettings());
+
+        var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetRecordsAsync<TaskRecord>("task", 1, 0, CancellationToken.None));
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+        Assert.Equal("bad", ex.Content);
+    }
 }

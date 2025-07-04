@@ -44,6 +44,7 @@ services.AddServiceNow(new ServiceNowSettings {
 var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var problem = await tableClient.GetRecordAsync<Problem>("problem", "abc123", null, CancellationToken.None);
+var recent = await tableClient.GetRecordsAsync<TaskRecord>("task", 10, 0, CancellationToken.None);
 ```
 
 ## CLI Usage
