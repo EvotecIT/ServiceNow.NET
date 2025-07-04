@@ -109,6 +109,18 @@ public class TableApiClientTests {
     }
 
     [Fact]
+    public async Task GetRecordAsync_InvalidJson_Throws() {
+        var mock = new MockServiceNowClient {
+            Response = new HttpResponseMessage(HttpStatusCode.OK) {
+                Content = new StringContent("{invalid")
+            }
+        };
+        var client = new TableApiClient(mock, new ServiceNowSettings());
+
+        await Assert.ThrowsAnyAsync<JsonException>(() => client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None));
+    }
+
+    [Fact]
     public async Task GetRecordAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
         var http = new HttpClient(handler);
