@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ServiceNow.Models;
 
 namespace ServiceNow.Clients;
 
@@ -38,36 +39,4 @@ public class TableMetadataClient {
         }
         return new TableMetadata(table, list);
     }
-}
-
-/// <summary>
-/// Represents metadata for a table.
-/// </summary>
-/// <summary>
-/// Metadata for a table.
-/// </summary>
-public class TableMetadata {
-    public TableMetadata(string table, List<TableField> fields) {
-        Table = table;
-        Fields = fields;
-    }
-
-    public string Table { get; }
-    public List<TableField> Fields { get; }
-}
-
-/// <summary>
-/// Represents a single table field.
-/// </summary>
-/// <summary>
-/// Metadata for a single field.
-/// </summary>
-public class TableField {
-    public TableField(string name, string type) {
-        Name = name;
-        Type = type;
-    }
-
-    public string Name { get; }
-    public string Type { get; }
 }
