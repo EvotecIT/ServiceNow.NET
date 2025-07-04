@@ -21,12 +21,12 @@ public class AttachmentApiClient {
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         content.Add(streamContent, "file", fileName);
 
-        var response = await _client.PostAsync($"/api/now/attachment/file?table_name={table}&table_sys_id={sysId}", content, CancellationToken.None).ConfigureAwait(false);
+        using var response = await _client.PostAsync($"/api/now/attachment/file?table_name={table}&table_sys_id={sysId}", content, CancellationToken.None).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteAttachmentAsync(string sysId, CancellationToken cancellationToken = default) {
-        var response = await _client.DeleteAsync($"/api/now/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
+        using var response = await _client.DeleteAsync($"/api/now/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 }
