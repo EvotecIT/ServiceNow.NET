@@ -21,6 +21,14 @@ public class AttachmentApiClient {
         => await _client.GetAsync($"/api/now/{_settings.ApiVersion}/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
 
     public async Task UploadAttachmentAsync(string table, string sysId, Stream file, string fileName) {
+        if (file is null) {
+            throw new ArgumentNullException(nameof(file));
+        }
+
+        if (fileName is null) {
+            throw new ArgumentNullException(nameof(fileName));
+        }
+
         using var content = new MultipartFormDataContent();
         var streamContent = new StreamContent(file);
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
