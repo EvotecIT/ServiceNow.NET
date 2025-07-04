@@ -23,4 +23,9 @@ public class ServiceNowSettings {
     /// Optional custom user agent string.
     /// </summary>
     public string UserAgent { get; set; } = "ServiceNow.NET";
+
+    /// <summary>
+    /// ServiceNow REST API version segment. Defaults to "v2".
+    /// </summary>
+    public string ApiVersion { get; set; } = "v2";
 }

@@ -9,13 +9,14 @@ using System.Text.Json;
 namespace ServiceNow.Tests;
 
 public class TableApiClientTests {
-    private static (TableApiClient Client, MockServiceNowClient Mock) Create() {
+    private static (TableApiClient Client, MockServiceNowClient Mock) Create(string version = "v2") {
         var mock = new MockServiceNowClient {
             Response = new HttpResponseMessage(HttpStatusCode.OK) {
                 Content = new StringContent("{}")
             }
         };
-        return (new TableApiClient(mock), mock);
+        var settings = new ServiceNowSettings { ApiVersion = version };
+        return (new TableApiClient(mock, settings), mock);
     }
 
     [Fact]
@@ -26,7 +27,7 @@ public class TableApiClientTests {
         var record = await client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/table/task/1", mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/1", mock.LastRelativeUrl);
         Assert.NotNull(record);
         Assert.Equal("1", record!.SysId);
     }
@@ -38,7 +39,7 @@ public class TableApiClientTests {
 
         await client.GetRecordAsync<TaskRecord>("task", "1", filters, CancellationToken.None);
 
-        Assert.Equal("/api/now/table/task/1?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/1?" + filters.ToQueryString(), mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class TableApiClientTests {
         await client.CreateRecordAsync("task", new { name = "foo" }, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Post, mock.LastMethod);
-        Assert.Equal("/api/now/table/task", mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task", mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -58,7 +59,7 @@ public class TableApiClientTests {
         await client.UpdateRecordAsync("task", "2", new { name = "bar" }, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Put, mock.LastMethod);
-        Assert.Equal("/api/now/table/task/2", mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/2", mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public class TableApiClientTests {
         await client.DeleteRecordAsync("task", "3", CancellationToken.None);
 
         Assert.Equal(HttpMethod.Delete, mock.LastMethod);
-        Assert.Equal("/api/now/table/task/3", mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/3", mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -80,8 +81,17 @@ public class TableApiClientTests {
         var records = await client.ListRecordsAsync<TaskRecord>("task", filters, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/table/task?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task?" + filters.ToQueryString(), mock.LastRelativeUrl);
         Assert.NotNull(records);
+    }
+
+    [Fact]
+    public async Task UsesCustomApiVersionInUrls() {
+        var (client, mock) = Create("v1");
+
+        await client.GetRecordAsync<TaskRecord>("task", "42", null, CancellationToken.None);
+
+        Assert.Equal("/api/now/v1/table/task/42", mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -91,7 +101,7 @@ public class TableApiClientTests {
                 Content = new StringContent("bad")
             }
         };
-        var client = new TableApiClient(mock);
+        var client = new TableApiClient(mock, new ServiceNowSettings());
 
         var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
@@ -108,7 +118,7 @@ public class TableApiClientTests {
             Password = "pass"
         };
         var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient);
+        var client = new TableApiClient(snClient, settings);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
