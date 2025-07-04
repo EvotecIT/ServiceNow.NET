@@ -23,7 +23,8 @@ public class WorkflowApiClient {
     /// <param name="payload">Input parameters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<string> StartExecutionAsync(string workflowId, object payload, CancellationToken cancellationToken = default) {
-        var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/workflow/{workflowId}/start", payload, cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.WorkflowStart, _settings.ApiVersion, workflowId);
+        var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -43,7 +44,8 @@ public class WorkflowApiClient {
     /// <param name="executionId">Execution identifier.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<string> GetExecutionStatusAsync(string executionId, CancellationToken cancellationToken = default) {
-        var response = await _client.GetAsync($"/api/now/{_settings.ApiVersion}/workflow/execution/{executionId}", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.WorkflowExecution, _settings.ApiVersion, executionId);
+        var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
