@@ -49,6 +49,13 @@ dotnet run --project ServiceNow.CLI -- --base-url https://instance.service-now.c
     --username admin --password password get-record incident abc123
 ```
 
+To generate a model class from table metadata:
+
+```bash
+dotnet run --project ServiceNow.CLI -- --base-url https://instance.service-now.com \
+    --username admin --password password generate-model incident Incident.cs
+```
+
 The CLI builds a service provider and registers typed clients via `AddHttpClient`.
 Failed requests throw `ServiceNowException` containing the status code and body.
 
