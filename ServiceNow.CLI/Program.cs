@@ -8,6 +8,8 @@ using ServiceNow.Extensions;
 using System.Text.Json;
 using ServiceNow.Utilities;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow instance base URL") { IsRequired = true };
 var usernameOption = new Option<string>("--username", description: "Username") { IsRequired = true };
@@ -145,6 +147,34 @@ listCmd.SetHandler(async (InvocationContext ctx) => {
 
 root.AddCommand(listCmd);
 
+var genTableArg = new Argument<string>("table", "Table name");
+var outputOpt = new Option<string>("--output", "Output file") { IsRequired = true };
+var genCmd = new Command("generate-model", "Generate C# model for a table") {
+    genTableArg,
+    outputOpt
+};
+genCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(genTableArg);
+    var output = ctx.ParseResult.GetValueForOption(outputOpt)!;
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var metaClient = provider.GetRequiredService<TableMetadataClient>();
+    var metadata = await metaClient.GetMetadataAsync(table, cancellationToken).ConfigureAwait(false);
+    var code = GenerateClass(metadata);
+    File.WriteAllText(output, code);
+    Console.WriteLine($"Model written to {output}");
+});
+
+root.AddCommand(genCmd);
+
 return await root.InvokeAsync(args);
 
 static Dictionary<string, string?> ParseFilters(IEnumerable<string> pairs) {
@@ -166,3 +196,41 @@ static Dictionary<string, string?> ParseFilters(IEnumerable<string> pairs) {
     }
     return dict;
 }
+
+static string GenerateClass(TableMetadata metadata) {
+    var className = ToPascal(metadata.Table);
+    var sb = new StringBuilder();
+    sb.AppendLine("namespace ServiceNow.Models;");
+    sb.AppendLine();
+    sb.AppendLine($"public class {className} {{");
+    foreach (var field in metadata.Fields) {
+        var type = MapType(field.Type);
+        var name = ToPascal(field.Name);
+        sb.AppendLine($"    public {type} {name} {{ get; set; }}");
+    }
+    sb.AppendLine("}");
+    return sb.ToString();
+}
+
+static string ToPascal(string value) {
+    if (string.IsNullOrEmpty(value)) return string.Empty;
+    var parts = value.Split('_');
+    var sb = new StringBuilder();
+    foreach (var p in parts) {
+        if (p.Length == 0) continue;
+        sb.Append(char.ToUpperInvariant(p[0]));
+        if (p.Length > 1) sb.Append(p.Substring(1));
+    }
+    return sb.ToString();
+}
+
+static string MapType(string type) => type switch {
+    "integer" => "int?",
+    "number" => "decimal?",
+    "float" => "float?",
+    "double" => "double?",
+    "boolean" => "bool?",
+    "glide_date_time" => "DateTime?",
+    "glide_date" => "DateTime?",
+    _ => "string?"
+};
