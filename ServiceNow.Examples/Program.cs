@@ -17,10 +17,16 @@ services.AddServiceNow(settings);
 using var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 
-Console.WriteLine("Retrieving record...");
-var record = await tableClient.GetRecordAsync<TaskRecord>("incident", "example_sys_id", null, CancellationToken.None);
+Console.WriteLine("Retrieving problem...");
+var problem = await tableClient.GetRecordAsync<Problem>("problem", "example_sys_id", null, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
-    record,
+    problem,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Retrieving configuration items...");
+var cis = await tableClient.ListRecordsAsync<ConfigurationItem>("cmdb_ci", null, CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    cis,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Creating record...");

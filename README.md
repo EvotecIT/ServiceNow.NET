@@ -19,6 +19,12 @@ This repository targets the following frameworks:
 - .NET Framework 4.7.2
 - .NET Standard 2.0 (library only)
 
+## Models
+
+The library provides simple classes for common tables like `Incident`, `Problem`,
+`ChangeRequest`, and `ConfigurationItem`. Each class includes basic properties such as
+`SysId` and `Number` (or `Name`).
+
 ## Configuration
 
 `ServiceNowSettings` requires `BaseUrl`, `Username` and `Password` to be provided when creating a `ServiceNowClient`.
@@ -37,6 +43,7 @@ services.AddServiceNow(new ServiceNowSettings {
 });
 var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
+var problem = await tableClient.GetRecordAsync<Problem>("problem", "abc123", null, CancellationToken.None);
 ```
 
 ## CLI Usage
