@@ -20,7 +20,7 @@ public class AttachmentApiClient {
     public async Task<HttpResponseMessage> GetAttachmentAsync(string sysId, CancellationToken cancellationToken = default)
         => await _client.GetAsync($"/api/now/{_settings.ApiVersion}/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
 
-    public async Task UploadAttachmentAsync(string table, string sysId, Stream file, string fileName) {
+    public async Task UploadAttachmentAsync(string table, string sysId, Stream file, string fileName, CancellationToken cancellationToken = default) {
         if (file is null) {
             throw new ArgumentNullException(nameof(file));
         }
@@ -34,7 +34,7 @@ public class AttachmentApiClient {
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         content.Add(streamContent, "file", fileName);
 
-        var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/attachment/file?table_name={table}&table_sys_id={sysId}", content, CancellationToken.None).ConfigureAwait(false);
+        var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/attachment/file?table_name={table}&table_sys_id={sysId}", content, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
