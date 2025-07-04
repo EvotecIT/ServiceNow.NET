@@ -13,12 +13,14 @@ var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow in
 var usernameOption = new Option<string>("--username", description: "Username") { IsRequired = true };
 var passwordOption = new Option<string>("--password", description: "Password") { IsRequired = true };
 var userAgentOption = new Option<string>("--user-agent", () => "ServiceNow.NET", "User agent") { IsRequired = false };
+var apiVersionOption = new Option<string>("--api-version", () => "v2", "API version") { IsRequired = false };
 
 var root = new RootCommand("ServiceNow CLI");
 root.AddGlobalOption(baseUrlOption);
 root.AddGlobalOption(usernameOption);
 root.AddGlobalOption(passwordOption);
 root.AddGlobalOption(userAgentOption);
+root.AddGlobalOption(apiVersionOption);
 
 var tableArg = new Argument<string>("table", "Table name");
 var sysIdArg = new Argument<string>("sysId", "Record sys_id");
@@ -38,9 +40,10 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
     var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
     var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
     var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
     var cancellationToken = ctx.GetCancellationToken();
 
-    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
     var services = new ServiceCollection();
     services.AddServiceNow(settings);
     using var provider = services.BuildServiceProvider();
@@ -65,9 +68,10 @@ createCmd.SetHandler(async (InvocationContext ctx) => {
     var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
     var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
     var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
     var cancellationToken = ctx.GetCancellationToken();
 
-    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
     var services = new ServiceCollection();
     services.AddServiceNow(settings);
     using var provider = services.BuildServiceProvider();
@@ -94,9 +98,10 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
     var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
     var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
     var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
     var cancellationToken = ctx.GetCancellationToken();
 
-    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
     var services = new ServiceCollection();
     services.AddServiceNow(settings);
     using var provider = services.BuildServiceProvider();
@@ -124,9 +129,10 @@ listCmd.SetHandler(async (InvocationContext ctx) => {
     var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
     var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
     var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
     var cancellationToken = ctx.GetCancellationToken();
 
-    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
     var services = new ServiceCollection();
     services.AddServiceNow(settings);
     using var provider = services.BuildServiceProvider();

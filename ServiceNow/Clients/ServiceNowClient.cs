@@ -14,6 +14,8 @@ public class ServiceNowClient : IServiceNowClient {
     private readonly HttpClient _httpClient;
     private readonly ServiceNowSettings _settings;
 
+    public ServiceNowSettings Settings => _settings;
+
     public ServiceNowClient(HttpClient httpClient, ServiceNowSettings settings) {
         if (string.IsNullOrEmpty(settings.BaseUrl)) {
             throw new ArgumentException("BaseUrl is required", nameof(settings));
