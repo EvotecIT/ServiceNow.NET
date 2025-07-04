@@ -26,6 +26,7 @@ public class ServiceNowClient : IServiceNowClient {
         _settings = settings;
 
         _httpClient.BaseAddress = new Uri(settings.BaseUrl);
+        _httpClient.Timeout = settings.Timeout;
         if (!settings.UseOAuth) {
             var authBytes = Encoding.ASCII.GetBytes($"{settings.Username}:{settings.Password}");
             _httpClient.DefaultRequestHeaders.Authorization =

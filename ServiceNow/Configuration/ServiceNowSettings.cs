@@ -50,6 +50,11 @@ public class ServiceNowSettings {
     public string UserAgent { get; set; } = "ServiceNow.NET";
 
     /// <summary>
+    /// Timeout for HTTP requests. Defaults to 100 seconds.
+    /// </summary>
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(100);
+
+    /// <summary>
     /// ServiceNow REST API version segment. Defaults to "v2".
     /// </summary>
     public string ApiVersion { get; set; } = "v2";
