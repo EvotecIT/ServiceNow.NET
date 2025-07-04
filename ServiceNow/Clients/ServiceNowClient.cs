@@ -104,10 +104,6 @@ public class ServiceNowClient : IServiceNowClient {
         return await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default)
-        => await _httpClient.DeleteAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
-    }
- 
     public async Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default) {
         await EnsureTokenAsync(cancellationToken).ConfigureAwait(false);
         return await _httpClient.DeleteAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
