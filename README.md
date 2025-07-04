@@ -47,6 +47,9 @@ var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var problem = await tableClient.GetRecordAsync<Problem>("problem", "abc123", null, CancellationToken.None);
 var recent = await tableClient.GetRecordsAsync<TaskRecord>("task", 10, 0, CancellationToken.None);
+await foreach (var rec in tableClient.StreamRecordsAsync<TaskRecord>("task", 50, CancellationToken.None)) {
+    Console.WriteLine(rec.SysId);
+}
 ```
 
 ## CLI Usage
@@ -79,6 +82,7 @@ Import-Module ./ServiceNow.PowerShell/bin/Debug/net8.0/ServiceNow.PowerShell.dll
 
 # Retrieve a record
 Get-ServiceNowRecord -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident -SysId abc123
+Get-ServiceNowRecordList -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident | Format-Table SysId, Number
 ```
 
 Like the CLI, the PowerShell module uses dependency injection with `AddHttpClient` and throws `ServiceNowException` on failure.

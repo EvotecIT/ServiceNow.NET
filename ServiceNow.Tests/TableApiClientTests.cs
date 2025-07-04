@@ -151,4 +151,51 @@ public class TableApiClientTests {
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
         Assert.Equal("bad", ex.Content);
     }
-}
+    [Fact]
+    public async Task StreamRecordsAsync_YieldsRecordsAcrossPages() {
+        var handler = new SequenceMessageHandler();
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
+            Content = new StringContent("[{\"SysId\":\"1\"}]")
+        });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
+            Content = new StringContent("[]")
+        });
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass"
+        };
+        var snClient = new ServiceNowClient(http, settings);
+        var client = new TableApiClient(snClient, settings);
+
+        var list = new List<TaskRecord>();
+        await foreach (var r in client.StreamRecordsAsync<TaskRecord>("task", 1, CancellationToken.None)) {
+            list.Add(r);
+        }
+
+        Assert.Single(list);
+        Assert.Equal("1", list[0].SysId);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=1&sysparm_offset=0", handler.Requests[0].RequestUri?.PathAndQuery);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=1&sysparm_offset=1", handler.Requests[1].RequestUri?.PathAndQuery);
+    }
+
+    [Fact]
+    public async Task StreamRecordsAsync_Error_ThrowsServiceNowException() {
+        var handler = new SequenceMessageHandler();
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent("bad") });
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass"
+        };
+        var snClient = new ServiceNowClient(http, settings);
+        var client = new TableApiClient(snClient, settings);
+
+        var ex = await Assert.ThrowsAsync<ServiceNowException>(async () => {
+            await foreach (var _ in client.StreamRecordsAsync<TaskRecord>("task", 1, CancellationToken.None)) { }
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+    }
+ }
