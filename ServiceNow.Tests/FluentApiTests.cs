@@ -13,7 +13,7 @@ public class FluentApiTests {
             Password = "pass"
         };
         var client = new ServiceNow.Clients.ServiceNowClient(http, settings);
-        var builder = client.Table("incident");
+        var builder = client.Table<Dictionary<string, string?>>("incident");
         Assert.NotNull(builder);
         Assert.Equal("incident", builder.TableName);
     }
