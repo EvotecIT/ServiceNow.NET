@@ -40,6 +40,22 @@ public class ServiceNowClientTests {
     }
 
     [Fact]
+    public void Constructor_SetsTimeout() {
+        var handler = new MockHttpMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass",
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+
+        _ = new ServiceNowClient(http, settings);
+
+        Assert.Equal(TimeSpan.FromSeconds(5), http.Timeout);
+    }
+
+    [Fact]
     public void Constructor_NullBaseUrl_Throws() {
         var handler = new MockHttpMessageHandler();
         var http = new HttpClient(handler);

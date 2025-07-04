@@ -29,6 +29,7 @@ The library provides simple classes for common tables like `Incident`, `Problem`
 
 `ServiceNowSettings` requires `BaseUrl`, `Username` and `Password` to be provided when creating a `ServiceNowClient`.
 An `ArgumentException` is thrown if `BaseUrl` is missing.
+The `Timeout` property controls the HTTP request timeout (default `00:01:40`).
 
 ### Using Dependency Injection
 
@@ -39,7 +40,8 @@ var services = new ServiceCollection();
 services.AddServiceNow(new ServiceNowSettings {
     BaseUrl = "https://instance.service-now.com",
     Username = "admin",
-    Password = "password"
+    Password = "password",
+    Timeout = TimeSpan.FromSeconds(100)
 });
 var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
