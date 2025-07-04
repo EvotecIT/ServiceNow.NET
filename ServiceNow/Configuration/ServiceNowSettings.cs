@@ -20,7 +20,37 @@ public class ServiceNowSettings {
     public string? Password { get; set; }
 
     /// <summary>
+    /// Use OAuth authentication instead of basic auth.
+    /// </summary>
+    public bool UseOAuth { get; set; }
+
+    /// <summary>
+    /// OAuth client identifier.
+    /// </summary>
+    public string? ClientId { get; set; }
+
+    /// <summary>
+    /// OAuth client secret.
+    /// </summary>
+    public string? ClientSecret { get; set; }
+
+    /// <summary>
+    /// Token endpoint used when obtaining an OAuth token.
+    /// </summary>
+    public string TokenUrl { get; set; } = "/oauth_token.do";
+
+    /// <summary>
+    /// Access token retrieved from the OAuth endpoint.
+    /// </summary>
+    public string? Token { get; set; }
+
+    /// <summary>
     /// Optional custom user agent string.
     /// </summary>
     public string UserAgent { get; set; } = "ServiceNow.NET";
+
+    /// <summary>
+    /// ServiceNow REST API version segment. Defaults to "v2".
+    /// </summary>
+    public string ApiVersion { get; set; } = "v2";
 }

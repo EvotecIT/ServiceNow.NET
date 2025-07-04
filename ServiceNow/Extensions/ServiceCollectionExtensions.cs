@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions {
         services.AddHttpClient<IServiceNowClient, ServiceNowClient>();
         services.AddTransient<TableApiClient>();
         services.AddTransient<AttachmentApiClient>();
+        services.AddTransient<TableMetadataClient>();
         return services;
     }
 }

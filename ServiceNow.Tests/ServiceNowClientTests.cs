@@ -135,4 +135,47 @@ public class ServiceNowClientTests {
         await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetAsync("/path", cts.Token));
         Assert.True(cts.IsCancellationRequested);
     }
+
+    [Fact]
+    public async Task GetAsync_UsesBearerToken_WhenProvided() {
+        var handler = new MockHttpMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            UseOAuth = true,
+            Token = "abc"
+        };
+
+        var client = new ServiceNowClient(http, settings);
+        await client.GetAsync("/path", CancellationToken.None);
+
+        Assert.Equal("Bearer", handler.LastRequest?.Headers.Authorization?.Scheme);
+        Assert.Equal("abc", handler.LastRequest?.Headers.Authorization?.Parameter);
+    }
+
+    [Fact]
+    public async Task GetAsync_RetrievesToken_WhenMissing() {
+        var handler = new SequenceMessageHandler();
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
+            Content = new StringContent("{\"access_token\":\"t1\"}")
+        });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
+            Content = new StringContent("{}")
+        });
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            UseOAuth = true,
+            ClientId = "cid",
+            ClientSecret = "secret",
+            TokenUrl = "https://example.com/token"
+        };
+        var client = new ServiceNowClient(http, settings);
+
+        await client.GetAsync("/resource", CancellationToken.None);
+
+        Assert.Equal("https://example.com/token", handler.Requests[0].RequestUri?.ToString());
+        Assert.Equal("Bearer", handler.Requests[1].Headers.Authorization?.Scheme);
+        Assert.Equal("t1", handler.Requests[1].Headers.Authorization?.Parameter);
+    }
 }
