@@ -11,6 +11,8 @@ public static class ServiceCollectionExtensions {
     /// <summary>
     /// Registers ServiceNow typed HTTP clients.
     /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="settings">Configuration settings.</param>
     public static IServiceCollection AddServiceNow(this IServiceCollection services, ServiceNowSettings settings) {
         services.AddSingleton(settings);
         services.AddHttpClient<IServiceNowClient, ServiceNowClient>();

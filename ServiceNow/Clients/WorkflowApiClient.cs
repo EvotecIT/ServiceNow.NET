@@ -11,6 +11,11 @@ public class WorkflowApiClient {
     private readonly IServiceNowClient _client;
     private readonly ServiceNowSettings _settings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WorkflowApiClient"/> class.
+    /// </summary>
+    /// <param name="client">Underlying HTTP client.</param>
+    /// <param name="settings">Client configuration settings.</param>
     public WorkflowApiClient(IServiceNowClient client, ServiceNowSettings settings) {
         _client = client;
         _settings = settings;

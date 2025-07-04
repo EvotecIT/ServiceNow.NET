@@ -10,6 +10,9 @@ using System.Collections.Generic;
 
 namespace ServiceNow.PowerShell;
 
+/// <summary>
+/// PowerShell cmdlet for streaming ServiceNow records.
+/// </summary>
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecordList")]
 public class GetServiceNowRecordList : PSCmdlet {
     [Parameter(Mandatory = true)]
@@ -27,6 +30,9 @@ public class GetServiceNowRecordList : PSCmdlet {
     [Parameter]
     public int BatchSize { get; set; } = 100;
 
+    /// <summary>
+    /// Executes the cmdlet.
+    /// </summary>
     protected override void ProcessRecord() {
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         var services = new ServiceCollection();

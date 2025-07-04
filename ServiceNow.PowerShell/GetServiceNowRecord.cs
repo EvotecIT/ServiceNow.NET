@@ -10,6 +10,9 @@ using System.Text.Json;
 
 namespace ServiceNow.PowerShell;
 
+/// <summary>
+/// PowerShell cmdlet for retrieving a single ServiceNow record.
+/// </summary>
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecord")]
 public class GetServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
@@ -27,6 +30,9 @@ public class GetServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string SysId { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Executes the cmdlet.
+    /// </summary>
     protected override void ProcessRecord() {
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         var services = new ServiceCollection();

@@ -4,11 +4,22 @@ using System.Linq;
 
 namespace ServiceNow.Extensions;
 
+/// <summary>
+/// Helper methods for converting dictionaries to query strings.
+/// </summary>
 public static class QueryStringExtensions {
+    /// <summary>
+    /// Converts a dictionary of string values to a URL encoded query string.
+    /// </summary>
+    /// <param name="parameters">Parameters to encode.</param>
     public static string ToQueryString(this IDictionary<string, string?> parameters)
         => parameters.ToDictionary(static kvp => kvp.Key, static kvp => (object?)kvp.Value)
             .ToQueryString();
 
+    /// <summary>
+    /// Converts a dictionary of object values to a URL encoded query string.
+    /// </summary>
+    /// <param name="parameters">Parameters to encode.</param>
     public static string ToQueryString(this IDictionary<string, object?> parameters) {
         var builder = new StringBuilder();
         foreach (var kvp in parameters) {

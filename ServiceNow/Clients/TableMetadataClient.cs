@@ -9,6 +9,10 @@ namespace ServiceNow.Clients;
 public class TableMetadataClient {
     private readonly IServiceNowClient _client;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TableMetadataClient"/> class.
+    /// </summary>
+    /// <param name="client">Underlying HTTP client.</param>
     public TableMetadataClient(IServiceNowClient client) => _client = client;
 
     /// <summary>
