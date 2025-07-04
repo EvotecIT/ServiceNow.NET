@@ -12,6 +12,6 @@ public static class ServiceNowClientFluentExtensions {
     /// </summary>
     /// <param name="client">The underlying client.</param>
     /// <param name="table">Table name.</param>
-    public static FluentTableApi Table(this ServiceNowClient client, string table)
+    public static FluentTableApi<TRecord> Table<TRecord>(this ServiceNowClient client, string table)
         => new(client, table);
 }
