@@ -17,7 +17,8 @@ public class TableMetadataClient {
     /// <param name="table">Table name.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<TableMetadata> GetMetadataAsync(string table, CancellationToken cancellationToken = default) {
-        var response = await _client.GetAsync($"/api/now/table/sys_dictionary?sysparm_query=name={table}&sysparm_fields=element,internal_type", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.TableMetadata, table);
+        var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);

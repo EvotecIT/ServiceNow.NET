@@ -18,7 +18,7 @@ public class AttachmentApiClient {
     }
 
     public async Task<HttpResponseMessage> GetAttachmentAsync(string sysId, CancellationToken cancellationToken = default)
-        => await _client.GetAsync($"/api/now/{_settings.ApiVersion}/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
+        => await _client.GetAsync(string.Format(ServiceNowApiPaths.Attachment, _settings.ApiVersion, sysId), cancellationToken).ConfigureAwait(false);
 
     public async Task UploadAttachmentAsync(string table, string sysId, Stream file, string fileName, CancellationToken cancellationToken = default) {
         if (file is null) {
@@ -34,12 +34,12 @@ public class AttachmentApiClient {
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
         content.Add(streamContent, "file", fileName);
 
-        var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/attachment/file?table_name={table}&table_sys_id={sysId}", content, cancellationToken).ConfigureAwait(false);
+        var response = await _client.PostAsync(string.Format(ServiceNowApiPaths.AttachmentFile, _settings.ApiVersion, table, sysId), content, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteAttachmentAsync(string sysId, CancellationToken cancellationToken = default) {
-        var response = await _client.DeleteAsync($"/api/now/{_settings.ApiVersion}/attachment/{sysId}", cancellationToken).ConfigureAwait(false);
+        var response = await _client.DeleteAsync(string.Format(ServiceNowApiPaths.Attachment, _settings.ApiVersion, sysId), cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
     }
 }

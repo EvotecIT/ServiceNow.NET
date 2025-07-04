@@ -21,7 +21,8 @@ public class TableApiClient {
 
     public async Task<T?> GetRecordAsync<T>(string table, string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default) {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
-        var response = await _client.GetAsync($"/api/now/{_settings.ApiVersion}/table/{table}/{sysId}{query}", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
+        var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -32,7 +33,8 @@ public class TableApiClient {
 
     public async Task<List<T>> ListRecordsAsync<T>(string table, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default) {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
-        var response = await _client.GetAsync($"/api/now/{_settings.ApiVersion}/table/{table}{query}", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
+        var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -43,7 +45,8 @@ public class TableApiClient {
 
     public async Task<IReadOnlyList<T>> GetRecordsAsync<T>(string table, int limit, int offset, CancellationToken cancellationToken = default) {
         var query = $"?sysparm_limit={limit}&sysparm_offset={offset}";
-        var response = await _client.GetAsync($"/api/now/{_settings.ApiVersion}/table/{table}{query}", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
+        var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -67,7 +70,8 @@ public class TableApiClient {
     }
 
     public async Task CreateRecordAsync<T>(string table, T record, CancellationToken cancellationToken = default) {
-        var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/table/{table}", record, cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
+        var response = await _client.PostAsync(path, record, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -75,7 +79,8 @@ public class TableApiClient {
     }
 
     public async Task UpdateRecordAsync<T>(string table, string sysId, T record, CancellationToken cancellationToken = default) {
-        var response = await _client.PutAsync($"/api/now/{_settings.ApiVersion}/table/{table}/{sysId}", record, cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
+        var response = await _client.PutAsync(path, record, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
@@ -83,7 +88,8 @@ public class TableApiClient {
     }
 
     public async Task DeleteRecordAsync(string table, string sysId, CancellationToken cancellationToken = default) {
-        var response = await _client.DeleteAsync($"/api/now/{_settings.ApiVersion}/table/{table}/{sysId}", cancellationToken).ConfigureAwait(false);
+        var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
+        var response = await _client.DeleteAsync(path, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
