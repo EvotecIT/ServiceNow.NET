@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using ServiceNow.Extensions;
 using ServiceNow.Utilities;
 using ServiceNow.Configuration;
@@ -49,6 +50,20 @@ public class TableApiClient {
         }
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new List<T>();
+    }
+
+    public async IAsyncEnumerable<T> StreamRecordsAsync<T>(string table, int batchSize = 100, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        var offset = 0;
+        while (true) {
+            var records = await GetRecordsAsync<T>(table, batchSize, offset, cancellationToken).ConfigureAwait(false);
+            if (records.Count == 0) {
+                yield break;
+            }
+            foreach (var record in records) {
+                yield return record;
+            }
+            offset += records.Count;
+        }
     }
 
     public async Task CreateRecordAsync<T>(string table, T record, CancellationToken cancellationToken = default) {
