@@ -1,6 +1,8 @@
 using ServiceNow.Clients;
+using ServiceNow.Configuration;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 
 namespace ServiceNow.Tests;
 
@@ -39,5 +41,34 @@ public class TableMetadataClientTests {
         var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetMetadataAsync("task", CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
         Assert.Equal("bad", ex.Content);
+    }
+
+    [Fact]
+    public async Task GetMetadataAsync_InvalidJson_Throws() {
+        var mock = new MockServiceNowClient {
+            Response = new HttpResponseMessage(HttpStatusCode.OK) {
+                Content = new StringContent("{invalid")
+            }
+        };
+        var client = new TableMetadataClient(mock);
+
+        await Assert.ThrowsAnyAsync<JsonException>(() => client.GetMetadataAsync("task", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task GetMetadataAsync_CancelledRequest_Throws() {
+        var handler = new CancelMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass"
+        };
+        var snClient = new ServiceNowClient(http, settings);
+        var client = new TableMetadataClient(snClient);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetMetadataAsync("task", cts.Token));
     }
 }
