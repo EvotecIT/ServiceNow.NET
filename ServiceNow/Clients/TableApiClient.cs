@@ -40,6 +40,17 @@ public class TableApiClient {
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }
 
+    public async Task<IReadOnlyList<T>> GetRecordsAsync<T>(string table, int limit, int offset, CancellationToken cancellationToken = default) {
+        var query = $"?sysparm_limit={limit}&sysparm_offset={offset}";
+        var response = await _client.GetAsync($"/api/now/{_settings.ApiVersion}/table/{table}{query}", cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) {
+            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new ServiceNowException(response.StatusCode, text);
+        }
+        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new List<T>();
+    }
+
     public async Task CreateRecordAsync<T>(string table, T record, CancellationToken cancellationToken = default) {
         var response = await _client.PostAsync($"/api/now/{_settings.ApiVersion}/table/{table}", record, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {
