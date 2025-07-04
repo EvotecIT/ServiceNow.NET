@@ -9,6 +9,9 @@ using System.Management.Automation;
 namespace ServiceNow.PowerShell;
 
 [Cmdlet(VerbsCommon.Remove, "ServiceNowRecord")]
+/// <summary>
+/// PowerShell cmdlet for removing a ServiceNow record.
+/// </summary>
 public class RemoveServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
@@ -28,6 +31,9 @@ public class RemoveServiceNowRecord : PSCmdlet {
     [Parameter]
     public SwitchParameter Force { get; set; }
 
+    /// <summary>
+    /// Executes the cmdlet.
+    /// </summary>
     protected override void ProcessRecord() {
         if (!Force && !ShouldContinue($"Delete record {SysId} from {Table}?", "Confirm")) {
             return;

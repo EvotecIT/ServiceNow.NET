@@ -28,30 +28,42 @@ public class FluentTableApi {
     /// <summary>
     /// Retrieves a record from the table.
     /// </summary>
+    /// <param name="sysId">Record sys_id.</param>
+    /// <param name="filters">Optional query filters.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<T?> GetAsync<T>(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
         => await _client.GetRecordAsync<T>(_table, sysId, filters, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Lists records from the table.
     /// </summary>
+    /// <param name="filters">Optional query filters.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<List<T>> ListAsync<T>(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
         => await _client.ListRecordsAsync<T>(_table, filters, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Creates a record in the table.
     /// </summary>
+    /// <param name="record">Record payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task CreateAsync<T>(T record, CancellationToken cancellationToken = default)
         => await _client.CreateRecordAsync(_table, record, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Updates a record in the table.
     /// </summary>
+    /// <param name="sysId">Record sys_id.</param>
+    /// <param name="record">Record payload.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task UpdateAsync<T>(string sysId, T record, CancellationToken cancellationToken = default)
         => await _client.UpdateRecordAsync(_table, sysId, record, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Deletes a record from the table.
     /// </summary>
+    /// <param name="sysId">Record sys_id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     public async Task DeleteAsync(string sysId, CancellationToken cancellationToken = default)
         => await _client.DeleteRecordAsync(_table, sysId, cancellationToken).ConfigureAwait(false);
 }

@@ -8,6 +8,9 @@ using System.Text.Json.Serialization;
 
 namespace ServiceNow.Utilities;
 
+/// <summary>
+/// Factory for creating <see cref="EnumMemberJsonConverter{T}"/> instances.
+/// </summary>
 public class EnumMemberJsonConverterFactory : JsonConverterFactory {
     public override bool CanConvert(Type typeToConvert)
         => (Nullable.GetUnderlyingType(typeToConvert) ?? typeToConvert).IsEnum;
@@ -39,10 +42,16 @@ public class EnumMemberJsonConverterFactory : JsonConverterFactory {
     }
 }
 
+/// <summary>
+/// JSON converter that uses <see cref="EnumMemberAttribute"/> values when serializing enums.
+/// </summary>
 public class EnumMemberJsonConverter<T> : JsonConverter<T> where T : struct, Enum {
     private readonly Dictionary<T, string> _toString = new();
     private readonly Dictionary<string, T> _fromString = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Initializes a new instance of the converter.
+    /// </summary>
     public EnumMemberJsonConverter() {
         var type = typeof(T);
         foreach (var value in Enum.GetValues(type).Cast<T>()) {

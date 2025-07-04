@@ -10,6 +10,9 @@ using ServiceNow.Utilities;
 
 namespace ServiceNow.PowerShell;
 
+/// <summary>
+/// PowerShell cmdlet for creating a ServiceNow record.
+/// </summary>
 [Cmdlet(VerbsCommon.New, "ServiceNowRecord")]
 public class NewServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
@@ -27,6 +30,9 @@ public class NewServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string Data { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Executes the cmdlet.
+    /// </summary>
     protected override void ProcessRecord() {
         var settings = new ServiceNowSettings { BaseUrl = BaseUrl, Username = Username, Password = Password };
         var services = new ServiceCollection();
