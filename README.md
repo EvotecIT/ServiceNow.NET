@@ -47,6 +47,9 @@ The command-line tool is in the `ServiceNow.CLI` project. Example:
 # Build and run the CLI
 dotnet run --project ServiceNow.CLI -- --base-url https://instance.service-now.com \
     --username admin --password password get-record incident abc123
+    # Patch a record
+dotnet run --project ServiceNow.CLI -- --base-url https://instance.service-now.com \
+    --username admin --password password patch-record incident abc123 --data '{"state":"2"}'
 ```
 
 The CLI builds a service provider and registers typed clients via `AddHttpClient`.
@@ -62,6 +65,9 @@ Import-Module ./ServiceNow.PowerShell/bin/Debug/net8.0/ServiceNow.PowerShell.dll
 
 # Retrieve a record
 Get-ServiceNowRecord -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident -SysId abc123
+
+# Patch a record
+Update-ServiceNowRecord -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident -SysId abc123 -Data '{"state":"2"}'
 ```
 
 Like the CLI, the PowerShell module uses dependency injection with `AddHttpClient` and throws `ServiceNowException` on failure.

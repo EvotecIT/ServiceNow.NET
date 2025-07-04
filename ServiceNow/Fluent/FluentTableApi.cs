@@ -50,6 +50,12 @@ public class FluentTableApi {
         => await _client.UpdateRecordAsync(_table, sysId, record, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
+    /// Patches a record in the table.
+    /// </summary>
+    public async Task PatchAsync<T>(string sysId, T record, CancellationToken cancellationToken = default)
+        => await _client.PatchRecordAsync(_table, sysId, record, cancellationToken).ConfigureAwait(false);
+
+    /// <summary>
     /// Deletes a record from the table.
     /// </summary>
     public async Task DeleteAsync(string sysId, CancellationToken cancellationToken = default)

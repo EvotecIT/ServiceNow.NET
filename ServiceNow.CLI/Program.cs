@@ -109,6 +109,36 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
 root.AddCommand(getCmd);
 root.AddCommand(createCmd);
 root.AddCommand(updateCmd);
+var patchTableArg = new Argument<string>("table", "Table name");
+var patchSysIdArg = new Argument<string>("sysId", "Record sys_id");
+var patchDataOpt = new Option<string>("--data", "JSON payload") { IsRequired = true };
+var patchCmd = new Command("patch-record", "Patch a record")
+{
+    patchTableArg,
+    patchSysIdArg,
+    patchDataOpt
+};
+patchCmd.SetHandler(async (InvocationContext ctx) => {
+    var table = ctx.ParseResult.GetValueForArgument(patchTableArg);
+    var sysId = ctx.ParseResult.GetValueForArgument(patchSysIdArg);
+    var data = ctx.ParseResult.GetValueForOption(patchDataOpt)!;
+    var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
+    var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
+    var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
+    var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
+    var cancellationToken = ctx.GetCancellationToken();
+
+    var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    using var provider = services.BuildServiceProvider();
+    var tableClient = provider.GetRequiredService<TableApiClient>();
+    var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
+    await tableClient.PatchRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
+    Console.WriteLine("Record patched.");
+});
+
+root.AddCommand(patchCmd);
 
 var listTableArg = new Argument<string>("table", "Table name");
 var listCmd = new Command("list-records", "List records")

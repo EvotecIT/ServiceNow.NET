@@ -62,6 +62,16 @@ public class TableApiClientTests {
     }
 
     [Fact]
+    public async Task PatchRecordAsync_SendsPatch() {
+        var (client, mock) = Create();
+
+        await client.PatchRecordAsync("task", "2", new { short_description = "foo" }, CancellationToken.None);
+
+        Assert.Equal(new HttpMethod("PATCH"), mock.LastMethod);
+        Assert.Equal("/api/now/table/task/2", mock.LastRelativeUrl);
+    }
+
+    [Fact]
     public async Task DeleteRecordAsync_SendsDelete() {
         var (client, mock) = Create();
 

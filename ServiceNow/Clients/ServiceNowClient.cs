@@ -42,6 +42,12 @@ public class ServiceNowClient : IServiceNowClient {
         return await _httpClient.PutAsync(relativeUrl, content, cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<HttpResponseMessage> PatchAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
+        var content = new StringContent(JsonSerializer.Serialize(payload, ServiceNowJson.Default), Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), relativeUrl) { Content = content };
+        return await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default)
         => await _httpClient.DeleteAsync(relativeUrl, cancellationToken).ConfigureAwait(false);
 }

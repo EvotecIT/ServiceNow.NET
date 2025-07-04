@@ -51,6 +51,14 @@ public class TableApiClient {
         }
     }
 
+    public async Task PatchRecordAsync<T>(string table, string sysId, T record, CancellationToken cancellationToken = default) {
+        var response = await _client.PatchAsync($"/api/now/table/{table}/{sysId}", record, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) {
+            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new ServiceNowException(response.StatusCode, text);
+        }
+    }
+
     public async Task DeleteRecordAsync(string table, string sysId, CancellationToken cancellationToken = default) {
         var response = await _client.DeleteAsync($"/api/now/table/{table}/{sysId}", cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) {

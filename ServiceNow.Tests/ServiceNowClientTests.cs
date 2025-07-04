@@ -95,6 +95,19 @@ public class ServiceNowClientTests {
     }
 
     [Fact]
+    public async Task PatchAsync_SendsPatchRequestWithJson() {
+        var handler = new MockHttpMessageHandler();
+        var client = CreateClient(handler);
+
+        await client.PatchAsync("/path", new { Name = "baz" }, CancellationToken.None);
+
+        Assert.Equal(new HttpMethod("PATCH"), handler.LastRequest?.Method);
+        Assert.Equal("https://example.com/path", handler.LastRequest?.RequestUri?.ToString());
+        Assert.Equal("{\"Name\":\"baz\"}", handler.RequestContent);
+        Assert.Equal("application/json", handler.LastRequest!.Content?.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
     public async Task DeleteAsync_SendsDeleteRequest() {
         var handler = new MockHttpMessageHandler();
         var client = CreateClient(handler);

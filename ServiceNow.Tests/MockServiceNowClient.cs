@@ -35,6 +35,13 @@ public class MockServiceNowClient : IServiceNowClient {
         return Task.FromResult(Response);
     }
 
+    public Task<HttpResponseMessage> PatchAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default) {
+        LastMethod = new HttpMethod("PATCH");
+        LastRelativeUrl = relativeUrl;
+        LastPayload = payload;
+        return Task.FromResult(Response);
+    }
+
     public Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default) {
         LastMethod = HttpMethod.Delete;
         LastRelativeUrl = relativeUrl;

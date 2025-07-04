@@ -10,5 +10,6 @@ public interface IServiceNowClient {
     Task<HttpResponseMessage> GetAsync(string relativeUrl, CancellationToken cancellationToken = default);
     Task<HttpResponseMessage> PostAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default);
     Task<HttpResponseMessage> PutAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default);
+    Task<HttpResponseMessage> PatchAsync<T>(string relativeUrl, T payload, CancellationToken cancellationToken = default);
     Task<HttpResponseMessage> DeleteAsync(string relativeUrl, CancellationToken cancellationToken = default);
 }
