@@ -101,6 +101,20 @@ public class TableApiClient {
     }
 
     /// <summary>
+    /// Retrieves all records from a table using paging.
+    /// </summary>
+    /// <param name="table">Table name.</param>
+    /// <param name="batchSize">Number of records per request.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task<List<T>> ListAllRecordsAsync<T>(string table, int batchSize = 100, CancellationToken cancellationToken = default) {
+        var list = new List<T>();
+        await foreach (var record in StreamRecordsAsync<T>(table, batchSize, cancellationToken)) {
+            list.Add(record);
+        }
+        return list;
+    }
+
+    /// <summary>
     /// Creates a record.
     /// </summary>
     /// <param name="table">Table name.</param>
