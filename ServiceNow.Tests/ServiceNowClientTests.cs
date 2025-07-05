@@ -1,5 +1,6 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -180,5 +181,62 @@ public class ServiceNowClientTests {
         Assert.Equal("https://example.com/token", handler.Requests[0].RequestUri?.ToString());
         Assert.Equal("Bearer", handler.Requests[1].Headers.Authorization?.Scheme);
         Assert.Equal("t1", handler.Requests[1].Headers.Authorization?.Parameter);
+    }
+
+    [Fact]
+    public async Task GetAsync_UsesStoredToken() {
+        var store = new InMemoryTokenStore {
+            Token = new TokenInfo {
+                AccessToken = "stored",
+                RefreshToken = "r1",
+                Expires = DateTimeOffset.UtcNow.AddMinutes(5)
+            }
+        };
+        var handler = new MockHttpMessageHandler();
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            UseOAuth = true,
+            TokenStore = store
+        };
+        var client = new ServiceNowClient(http, settings);
+
+        await client.GetAsync("/path", CancellationToken.None);
+
+        Assert.Equal("Bearer", handler.LastRequest?.Headers.Authorization?.Scheme);
+        Assert.Equal("stored", handler.LastRequest?.Headers.Authorization?.Parameter);
+    }
+
+    [Fact]
+    public async Task GetAsync_RefreshesExpiredToken() {
+        var handler = new SequenceMessageHandler();
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
+            Content = new StringContent("{\"access_token\":\"new\",\"refresh_token\":\"r2\",\"expires_in\":3600}")
+        });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") });
+        var http = new HttpClient(handler);
+        var store = new InMemoryTokenStore {
+            Token = new TokenInfo {
+                AccessToken = "old",
+                RefreshToken = "r1",
+                Expires = DateTimeOffset.UtcNow.AddSeconds(-5)
+            }
+        };
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            UseOAuth = true,
+            TokenUrl = "https://example.com/token",
+            TokenStore = store
+        };
+        var client = new ServiceNowClient(http, settings);
+
+        await client.GetAsync("/resource", CancellationToken.None);
+
+        Assert.Contains("grant_type=refresh_token", handler.RequestContents[0]);
+        Assert.Contains("refresh_token=r1", handler.RequestContents[0]);
+        Assert.Equal("new", store.Token?.AccessToken);
+        Assert.Equal("r2", store.Token?.RefreshToken);
+        Assert.Equal("Bearer", handler.Requests[1].Headers.Authorization?.Scheme);
+        Assert.Equal("new", handler.Requests[1].Headers.Authorization?.Parameter);
     }
 }

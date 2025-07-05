@@ -1,4 +1,5 @@
 using ServiceNow.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,9 +46,33 @@ public class ServiceNowClient : IServiceNowClient {
             return;
         }
 
-        if (!string.IsNullOrEmpty(_settings.Token)) {
+        if (string.IsNullOrEmpty(_settings.Token) && _settings.TokenStore is not null) {
+            var stored = await _settings.TokenStore.LoadAsync(cancellationToken).ConfigureAwait(false);
+            if (stored is not null) {
+                _settings.Token = stored.AccessToken;
+                _settings.RefreshToken = stored.RefreshToken;
+                _settings.TokenExpires = stored.Expires;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(_settings.Token) && (_settings.TokenExpires == default || _settings.TokenExpires > DateTimeOffset.UtcNow)) {
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", _settings.Token);
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(_settings.RefreshToken)) {
+            var refreshPairs = new Dictionary<string, string> {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = _settings.RefreshToken
+            };
+            if (!string.IsNullOrEmpty(_settings.ClientId)) {
+                refreshPairs["client_id"] = _settings.ClientId!;
+            }
+            if (!string.IsNullOrEmpty(_settings.ClientSecret)) {
+                refreshPairs["client_secret"] = _settings.ClientSecret!;
+            }
+            await AcquireTokenAsync(refreshPairs, cancellationToken).ConfigureAwait(false);
             return;
         }
 
@@ -73,6 +98,10 @@ public class ServiceNowClient : IServiceNowClient {
             }
         }
 
+        await AcquireTokenAsync(pairs, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task AcquireTokenAsync(Dictionary<string, string> pairs, CancellationToken cancellationToken) {
         var content = new FormUrlEncodedContent(pairs);
         var response = await _httpClient.PostAsync(_settings.TokenUrl, content, cancellationToken)
             .ConfigureAwait(false);
@@ -80,11 +109,30 @@ public class ServiceNowClient : IServiceNowClient {
             var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new ServiceNowException(response.StatusCode, text);
         }
+
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         _settings.Token = doc.RootElement.GetProperty("access_token").GetString();
+        if (doc.RootElement.TryGetProperty("refresh_token", out var rt)) {
+            _settings.RefreshToken = rt.GetString();
+        }
+        if (doc.RootElement.TryGetProperty("expires_in", out var exp)) {
+            var seconds = exp.GetInt32();
+            _settings.TokenExpires = DateTimeOffset.UtcNow.AddSeconds(seconds);
+        } else {
+            _settings.TokenExpires = DateTimeOffset.UtcNow.AddHours(1);
+        }
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _settings.Token);
+
+        if (_settings.TokenStore is not null && !string.IsNullOrEmpty(_settings.Token)) {
+            var info = new TokenInfo {
+                AccessToken = _settings.Token,
+                RefreshToken = _settings.RefreshToken,
+                Expires = _settings.TokenExpires
+            };
+            await _settings.TokenStore.SaveAsync(info, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     /// <summary>
