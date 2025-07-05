@@ -20,6 +20,8 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<AttachmentApiClient>();
         services.AddTransient<TableMetadataClient>();
         services.AddTransient<WorkflowApiClient>();
+        services.AddTransient<CatalogItemClient>();
+        services.AddTransient<CatalogRequestClient>();
         return services;
     }
 }
