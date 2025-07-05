@@ -36,8 +36,8 @@ The `Timeout` property controls the HTTP request timeout (default `00:01:40`).
 You can register the clients with `IServiceCollection`:
 
 The library includes typed clients like `TableApiClient`, `AttachmentApiClient`,
-`WorkflowApiClient`, `CatalogItemClient`, and `CatalogRequestClient` for common
-operations.
+`WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, and
+`EventApiClient` for common operations.
 
 ```csharp
 var services = new ServiceCollection();

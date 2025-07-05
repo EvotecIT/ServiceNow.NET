@@ -65,4 +65,9 @@ public static class ServiceNowApiPaths {
     /// Format string for retrieving approvals for a catalog request.
     /// </summary>
     public const string CatalogRequestApprovals = "/api/sn_sc/{0}/request/{1}/approvals";
+
+    /// <summary>
+    /// Endpoint for posting Event Management events.
+    /// </summary>
+    public const string EmEvent = "/api/global/em_event";
 }
