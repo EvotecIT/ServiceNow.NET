@@ -40,4 +40,29 @@ public static class ServiceNowApiPaths {
     /// Format string for retrieving workflow execution status.
     /// </summary>
     public const string WorkflowExecution = "/api/now/{0}/workflow/execution/{1}";
+
+    /// <summary>
+    /// Format string for retrieving catalog items.
+    /// </summary>
+    public const string CatalogItems = "/api/sn_sc/{0}/catalog/items";
+
+    /// <summary>
+    /// Format string for retrieving a single catalog item.
+    /// </summary>
+    public const string CatalogItem = "/api/sn_sc/{0}/catalog/items/{1}";
+
+    /// <summary>
+    /// Format string for submitting a catalog item request.
+    /// </summary>
+    public const string CatalogItemOrder = "/api/sn_sc/{0}/catalog/items/{1}/order_now";
+
+    /// <summary>
+    /// Format string for retrieving a catalog request.
+    /// </summary>
+    public const string CatalogRequest = "/api/sn_sc/{0}/request/{1}";
+
+    /// <summary>
+    /// Format string for retrieving approvals for a catalog request.
+    /// </summary>
+    public const string CatalogRequestApprovals = "/api/sn_sc/{0}/request/{1}/approvals";
 }
