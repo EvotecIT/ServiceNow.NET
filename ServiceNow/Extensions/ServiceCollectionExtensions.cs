@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<WorkflowApiClient>();
         services.AddTransient<CatalogItemClient>();
         services.AddTransient<CatalogRequestClient>();
+        services.AddTransient<EventApiClient>();
         return services;
     }
 }
