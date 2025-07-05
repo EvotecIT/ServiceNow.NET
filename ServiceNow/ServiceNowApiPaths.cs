@@ -70,4 +70,9 @@ public static class ServiceNowApiPaths {
     /// Endpoint for posting Event Management events.
     /// </summary>
     public const string EmEvent = "/api/global/em_event";
+
+    /// <summary>
+    /// Format string for posting to the Import Set API.
+    /// </summary>
+    public const string ImportSet = "/api/now/import/{0}";
 }
