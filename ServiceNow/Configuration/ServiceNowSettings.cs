@@ -45,6 +45,21 @@ public class ServiceNowSettings {
     public string? Token { get; set; }
 
     /// <summary>
+    /// Refresh token used to obtain a new access token.
+    /// </summary>
+    public string? RefreshToken { get; set; }
+
+    /// <summary>
+    /// Expiration time of the access token in UTC.
+    /// </summary>
+    public DateTimeOffset TokenExpires { get; set; }
+
+    /// <summary>
+    /// Optional store used for persisting tokens.
+    /// </summary>
+    public ITokenStore? TokenStore { get; set; }
+
+    /// <summary>
     /// Optional custom user agent string.
     /// </summary>
     public string UserAgent { get; set; } = "ServiceNow.NET";
