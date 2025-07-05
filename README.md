@@ -22,8 +22,9 @@ This repository targets the following frameworks:
 ## Models
 
 The library provides simple classes for common tables like `Incident`, `Problem`,
-`ChangeRequest`, and `ConfigurationItem`. Each class includes basic properties such as
-`SysId` and `Number` (or `Name`).
+`ChangeRequest`, `ConfigurationItem`, and `ApplicationService`. Each class includes basic
+properties such as `SysId` and `Number` (or `Name`). Additional types like `ServiceMap`,
+`ServiceMapNode`, and `ServiceMapDependency` model service relationships.
 
 ## Configuration
 
@@ -36,8 +37,8 @@ The `Timeout` property controls the HTTP request timeout (default `00:01:40`).
 You can register the clients with `IServiceCollection`:
 
 The library includes typed clients like `TableApiClient`, `AttachmentApiClient`,
-`WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, and
-`EventApiClient` for common operations.
+`WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, `EventApiClient`,
+and `ApplicationServiceClient` for common operations.
 
 ```csharp
 var services = new ServiceCollection();

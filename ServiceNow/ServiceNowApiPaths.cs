@@ -70,4 +70,14 @@ public static class ServiceNowApiPaths {
     /// Endpoint for posting Event Management events.
     /// </summary>
     public const string EmEvent = "/api/global/em_event";
+
+    /// <summary>
+    /// Format string for retrieving application services.
+    /// </summary>
+    public const string ApplicationService = "/api/now/{0}/table/cmdb_ci_service";
+
+    /// <summary>
+    /// Format string for retrieving a service map for an application service.
+    /// </summary>
+    public const string ServiceMap = "/api/now/{0}/cmdb_ci_service/{1}/service-map";
 }
