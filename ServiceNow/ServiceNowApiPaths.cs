@@ -70,4 +70,14 @@ public static class ServiceNowApiPaths {
     /// Endpoint for posting Event Management events.
     /// </summary>
     public const string EmEvent = "/api/global/em_event";
+
+    /// <summary>
+    /// Endpoint for sending outbound email notifications.
+    /// </summary>
+    public const string EmailOutbound = "/api/now/{0}/email/outbound";
+
+    /// <summary>
+    /// Format string for retrieving inbound email details.
+    /// </summary>
+    public const string EmailInbound = "/api/now/{0}/email/inbound/{1}";
 }
