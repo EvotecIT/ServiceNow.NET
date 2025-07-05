@@ -72,6 +72,26 @@ public static class ServiceNowApiPaths {
     public const string EmEvent = "/api/global/em_event";
 
     /// <summary>
+    /// Format string for searching knowledge articles.
+    /// </summary>
+    public const string KnowledgeSearch = "/api/now/{0}/knowledge";
+
+    /// <summary>
+    /// Format string for retrieving a single knowledge article.
+    /// </summary>
+    public const string KnowledgeArticle = "/api/now/{0}/knowledge/{1}";
+
+    /// <summary>
+    /// Format string for retrieving article attachments.
+    /// </summary>
+    public const string KnowledgeArticleAttachments = "/api/now/{0}/knowledge/{1}/attachments";
+
+    /// <summary>
+    /// Format string for retrieving knowledge categories.
+    /// </summary>
+    public const string KnowledgeCategories = "/api/now/{0}/knowledge/categories";
+  
+    /// <summary>
     /// Format string for retrieving application services.
     /// </summary>
     public const string ApplicationService = "/api/now/{0}/table/cmdb_ci_service";
