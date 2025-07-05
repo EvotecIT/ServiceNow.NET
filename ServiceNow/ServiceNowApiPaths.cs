@@ -80,4 +80,9 @@ public static class ServiceNowApiPaths {
     /// Format string for retrieving a service map for an application service.
     /// </summary>
     public const string ServiceMap = "/api/now/{0}/cmdb_ci_service/{1}/service-map";
+  
+    /// <summary>
+    /// Format string for posting to the Import Set API.
+    /// </summary>
+    public const string ImportSet = "/api/now/import/{0}";
 }

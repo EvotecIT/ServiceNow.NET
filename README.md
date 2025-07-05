@@ -38,7 +38,7 @@ You can register the clients with `IServiceCollection`:
 
 The library includes typed clients like `TableApiClient`, `AttachmentApiClient`,
 `WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, `EventApiClient`,
-and `ApplicationServiceClient` for common operations.
+and `ApplicationServiceClient`, `UserApiClient` for common operations.
 
 ```csharp
 var services = new ServiceCollection();
