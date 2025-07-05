@@ -22,8 +22,9 @@ This repository targets the following frameworks:
 ## Models
 
 The library provides simple classes for common tables like `Incident`, `Problem`,
-`ChangeRequest`, and `ConfigurationItem`. Each class includes basic properties such as
-`SysId` and `Number` (or `Name`).
+`ChangeRequest`, `ConfigurationItem`, and `ApplicationService`. Each class includes basic
+properties such as `SysId` and `Number` (or `Name`). Additional types like `ServiceMap`,
+`ServiceMapNode`, and `ServiceMapDependency` model service relationships.
 
 ## Configuration
 
@@ -37,7 +38,7 @@ You can register the clients with `IServiceCollection`:
 
 The library includes typed clients like `TableApiClient`, `AttachmentApiClient`,
 `WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, `EventApiClient`,
-and `UserApiClient` for common operations.
+and `ApplicationServiceClient`, `UserApiClient` for common operations.
 
 ```csharp
 var services = new ServiceCollection();
