@@ -80,4 +80,39 @@ public static class ServiceNowApiPaths {
     /// Format string for retrieving inbound email details.
     /// </summary>
     public const string EmailInbound = "/api/now/{0}/email/inbound/{1}";
+  
+    /// <summary>
+    /// Format string for searching knowledge articles.
+    /// </summary>
+    public const string KnowledgeSearch = "/api/now/{0}/knowledge";
+
+    /// <summary>
+    /// Format string for retrieving a single knowledge article.
+    /// </summary>
+    public const string KnowledgeArticle = "/api/now/{0}/knowledge/{1}";
+
+    /// <summary>
+    /// Format string for retrieving article attachments.
+    /// </summary>
+    public const string KnowledgeArticleAttachments = "/api/now/{0}/knowledge/{1}/attachments";
+
+    /// <summary>
+    /// Format string for retrieving knowledge categories.
+    /// </summary>
+    public const string KnowledgeCategories = "/api/now/{0}/knowledge/categories";
+  
+    /// <summary>
+    /// Format string for retrieving application services.
+    /// </summary>
+    public const string ApplicationService = "/api/now/{0}/table/cmdb_ci_service";
+
+    /// <summary>
+    /// Format string for retrieving a service map for an application service.
+    /// </summary>
+    public const string ServiceMap = "/api/now/{0}/cmdb_ci_service/{1}/service-map";
+  
+    /// <summary>
+    /// Format string for posting to the Import Set API.
+    /// </summary>
+    public const string ImportSet = "/api/now/import/{0}";
 }
