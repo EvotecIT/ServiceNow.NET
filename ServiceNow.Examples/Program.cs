@@ -1,6 +1,7 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
+using ServiceNow.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
 using System.Text.Json;
@@ -32,4 +33,11 @@ Console.WriteLine(JsonSerializer.Serialize(
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };
 await client.Table<Dictionary<string, string?>>("incident").CreateAsync(payload, CancellationToken.None);
+Console.WriteLine("Assigning incident...");
+var incidentClient = provider.GetRequiredService<IncidentClient>();
+await incidentClient.AssignAsync("example_incident", "user_sys_id", IncidentState.New, CancellationToken.None);
+Console.WriteLine("Resolving incident...");
+await incidentClient.ResolveAsync("example_incident", IncidentState.InProgress, CancellationToken.None);
+Console.WriteLine("Closing incident...");
+await incidentClient.CloseAsync("example_incident", IncidentState.Resolved, CancellationToken.None);
 Console.WriteLine("Done");
