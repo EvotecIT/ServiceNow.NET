@@ -115,4 +115,9 @@ public static class ServiceNowApiPaths {
     /// Format string for posting to the Import Set API.
     /// </summary>
     public const string ImportSet = "/api/now/import/{0}";
+
+    /// <summary>
+    /// Format string for performing search queries.
+    /// </summary>
+    public const string Search = "/api/now/{0}/search";
 }

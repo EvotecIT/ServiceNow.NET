@@ -1,4 +1,4 @@
-#if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER || NETFRAMEWORK
 using ServiceNow.PowerShell;
 using PS = System.Management.Automation.PowerShell;
 using Xunit;

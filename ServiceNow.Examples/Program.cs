@@ -29,6 +29,13 @@ Console.WriteLine(JsonSerializer.Serialize(
     cis,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Searching knowledge...");
+var searchClient = provider.GetRequiredService<SearchApiClient>();
+var articles = await searchClient.SearchKnowledgeAsync<KnowledgeSearchResult>("password reset", CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    articles,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };
 await client.Table<Dictionary<string, string?>>("incident").CreateAsync(payload, CancellationToken.None);

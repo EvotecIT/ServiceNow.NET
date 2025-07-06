@@ -6,8 +6,6 @@ using ServiceNow.Models;
 using System.Management.Automation;
 using System.Collections.Generic;
 
-#if NET8_0_OR_GREATER
-
 namespace ServiceNow.PowerShell;
 
 /// <summary>
@@ -50,4 +48,3 @@ public class GetServiceNowRecordList : PSCmdlet {
     }
 }
 
-#endif
