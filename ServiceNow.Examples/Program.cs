@@ -30,6 +30,13 @@ Console.WriteLine(JsonSerializer.Serialize(
     cis,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Retrieving report...");
+var reportClient = provider.GetRequiredService<ReportApiClient>();
+var report = await reportClient.GetReportAsync<Dictionary<string, object>>("daily_incidents", null, CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    report,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };
 await tableClient.CreateRecordAsync("incident", payload, CancellationToken.None);

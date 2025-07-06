@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
 using System.Management.Automation;
 
-#if NET8_0_OR_GREATER
-
 namespace ServiceNow.PowerShell;
 
 [Cmdlet(VerbsCommon.Remove, "ServiceNowRecord")]
@@ -47,4 +45,3 @@ public class RemoveServiceNowRecord : PSCmdlet {
         tableClient.DeleteRecordAsync(Table, SysId, CancellationToken.None).GetAwaiter().GetResult();
     }
 }
-#endif
