@@ -2,17 +2,17 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
-using ServiceNow.Models;
 using System.Management.Automation;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace ServiceNow.PowerShell;
 
 /// <summary>
-/// PowerShell cmdlet for streaming ServiceNow records.
+/// PowerShell cmdlet for retrieving a ServiceNow report.
 /// </summary>
-[Cmdlet(VerbsCommon.Get, "ServiceNowRecordList")]
-public class GetServiceNowRecordList : PSCmdlet {
+[Cmdlet(VerbsCommon.Get, "ServiceNowReport")]
+public class GetServiceNowReport : PSCmdlet {
     [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
 
@@ -23,10 +23,7 @@ public class GetServiceNowRecordList : PSCmdlet {
     public string Password { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
-    public string Table { get; set; } = string.Empty;
-
-    [Parameter]
-    public int BatchSize { get; set; } = 100;
+    public string Report { get; set; } = string.Empty;
 
     /// <summary>
     /// Executes the cmdlet.
@@ -36,14 +33,8 @@ public class GetServiceNowRecordList : PSCmdlet {
         var services = new ServiceCollection();
         services.AddServiceNow(settings);
         using var provider = services.BuildServiceProvider();
-        var tableClient = provider.GetRequiredService<TableApiClient>();
-        var enumerator = tableClient.StreamRecordsAsync<TaskRecord>(Table, BatchSize, CancellationToken.None).GetAsyncEnumerator();
-        try {
-            while (enumerator.MoveNextAsync().GetAwaiter().GetResult()) {
-                WriteObject(enumerator.Current, true);
-            }
-        } finally {
-            enumerator.DisposeAsync().GetAwaiter().GetResult();
-        }
+        var reportClient = provider.GetRequiredService<ReportApiClient>();
+        var result = reportClient.GetReportAsync<Dictionary<string, object>>(Report, null, CancellationToken.None).GetAwaiter().GetResult();
+        WriteObject(result);
     }
 }

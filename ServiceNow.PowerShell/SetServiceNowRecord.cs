@@ -6,8 +6,6 @@ using System.Management.Automation;
 using System.Text.Json;
 using ServiceNow.Utilities;
 
-#if NET8_0_OR_GREATER
-
 namespace ServiceNow.PowerShell;
 
 /// <summary>
@@ -46,4 +44,3 @@ public class SetServiceNowRecord : PSCmdlet {
         tableClient.UpdateRecordAsync(Table, SysId, payload, CancellationToken.None).GetAwaiter().GetResult();
     }
 }
-#endif

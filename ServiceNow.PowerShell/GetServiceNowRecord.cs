@@ -6,8 +6,6 @@ using ServiceNow.Extensions;
 using System.Management.Automation;
 using System.Text.Json;
 
-#if NET8_0_OR_GREATER
-
 namespace ServiceNow.PowerShell;
 
 /// <summary>
@@ -43,4 +41,3 @@ public class GetServiceNowRecord : PSCmdlet {
         WriteObject(record);
     }
 }
-#endif

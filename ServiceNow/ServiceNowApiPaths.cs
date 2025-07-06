@@ -115,4 +115,14 @@ public static class ServiceNowApiPaths {
     /// Format string for posting to the Import Set API.
     /// </summary>
     public const string ImportSet = "/api/now/import/{0}";
+
+    /// <summary>
+    /// Format string for listing reports or analytics data.
+    /// </summary>
+    public const string Reports = "/api/now/{0}/report";
+
+    /// <summary>
+    /// Format string for retrieving a specific report or analytics dataset.
+    /// </summary>
+    public const string ReportRecord = "/api/now/{0}/report/{1}";
 }

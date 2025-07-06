@@ -38,9 +38,8 @@ You can register the clients with `IServiceCollection`:
 
 The library includes typed clients like `TableApiClient`, `AttachmentApiClient`,
 `WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`,
-`EventApiClient`, and `EmailApiClient`, 
-`WorkflowApiClient`, `CatalogItemClient`, `CatalogRequestClient`, `EventApiClient`,
-and `ApplicationServiceClient`, `UserApiClient` for common operations.
+`EventApiClient`, `EmailApiClient`, `ApplicationServiceClient`, `UserApiClient`,
+and `ReportApiClient` for common operations.
 
 ```csharp
 var services = new ServiceCollection();
@@ -57,6 +56,10 @@ var recent = await tableClient.GetRecordsAsync<TaskRecord>("task", 10, 0, Cancel
 await foreach (var rec in tableClient.StreamRecordsAsync<TaskRecord>("task", 50, CancellationToken.None)) {
     Console.WriteLine(rec.SysId);
 }
+
+var reportClient = provider.GetRequiredService<ReportApiClient>();
+var report = await reportClient.GetReportAsync<Dictionary<string, object>>("daily_incidents", null, CancellationToken.None);
+Console.WriteLine(report?.Count);
 ```
 
 ## CLI Usage
@@ -90,6 +93,7 @@ Import-Module ./ServiceNow.PowerShell/bin/Debug/net8.0/ServiceNow.PowerShell.dll
 # Retrieve a record
 Get-ServiceNowRecord -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident -SysId abc123
 Get-ServiceNowRecordList -BaseUrl https://instance.service-now.com -Username admin -Password password -Table incident | Format-Table SysId, Number
+Get-ServiceNowReport -BaseUrl https://instance.service-now.com -Username admin -Password password -Report daily_incidents
 ```
 
 Like the CLI, the PowerShell module uses dependency injection with `AddHttpClient` and throws `ServiceNowException` on failure.
