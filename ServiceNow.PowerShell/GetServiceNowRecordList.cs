@@ -14,18 +14,33 @@ namespace ServiceNow.PowerShell;
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecordList")]
 public class GetServiceNowRecordList : PSCmdlet {
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Base URL of the ServiceNow instance.
+    /// </summary>
     public string BaseUrl { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Username used for authentication.
+    /// </summary>
     public string Username { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Password used for authentication.
+    /// </summary>
     public string Password { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Name of the table to query.
+    /// </summary>
     public string Table { get; set; } = string.Empty;
 
     [Parameter]
+    /// <summary>
+    /// Number of records to retrieve per batch.
+    /// </summary>
     public int BatchSize { get; set; } = 100;
 
     /// <summary>

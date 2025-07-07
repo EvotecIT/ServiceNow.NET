@@ -14,18 +14,33 @@ namespace ServiceNow.PowerShell;
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecord")]
 public class GetServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Base URL of the ServiceNow instance.
+    /// </summary>
     public string BaseUrl { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Username used for authentication.
+    /// </summary>
     public string Username { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Password used for authentication.
+    /// </summary>
     public string Password { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Name of the table containing the record.
+    /// </summary>
     public string Table { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Sys_id of the record to retrieve.
+    /// </summary>
     public string SysId { get; set; } = string.Empty;
 
     /// <summary>

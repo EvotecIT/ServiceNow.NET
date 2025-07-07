@@ -14,15 +14,27 @@ namespace ServiceNow.PowerShell;
 [Cmdlet(VerbsCommon.Get, "ServiceNowReport")]
 public class GetServiceNowReport : PSCmdlet {
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Base URL of the ServiceNow instance.
+    /// </summary>
     public string BaseUrl { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Username used for authentication.
+    /// </summary>
     public string Username { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Password used for authentication.
+    /// </summary>
     public string Password { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Identifier of the report to retrieve.
+    /// </summary>
     public string Report { get; set; } = string.Empty;
 
     /// <summary>
