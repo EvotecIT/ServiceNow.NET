@@ -14,18 +14,33 @@ namespace ServiceNow.PowerShell;
 [Cmdlet(VerbsCommon.New, "ServiceNowRecord")]
 public class NewServiceNowRecord : PSCmdlet {
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Base URL of the ServiceNow instance.
+    /// </summary>
     public string BaseUrl { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Username used for authentication.
+    /// </summary>
     public string Username { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Password used for authentication.
+    /// </summary>
     public string Password { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// Name of the table in which to create the record.
+    /// </summary>
     public string Table { get; set; } = string.Empty;
 
     [Parameter(Mandatory = true)]
+    /// <summary>
+    /// JSON payload describing the record to create.
+    /// </summary>
     public string Data { get; set; } = string.Empty;
 
     /// <summary>
