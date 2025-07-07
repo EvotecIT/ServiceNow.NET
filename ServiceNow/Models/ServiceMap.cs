@@ -7,7 +7,14 @@ namespace ServiceNow.Models;
 /// Represents a service map consisting of nodes and dependencies.
 /// </summary>
 public class ServiceMap {
+    /// <summary>
+    /// Gets or sets the nodes that make up the map.
+    /// </summary>
     public List<ServiceMapNode> Nodes { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the dependencies between nodes.
+    /// </summary>
     public List<ServiceMapDependency> Dependencies { get; set; } = new();
 
     /// <summary>

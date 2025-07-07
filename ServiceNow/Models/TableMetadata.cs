@@ -16,6 +16,13 @@ public class TableMetadata {
         Fields = fields;
     }
 
+    /// <summary>
+    /// Gets the table name.
+    /// </summary>
     public string Table { get; }
+
+    /// <summary>
+    /// Gets the collection of fields.
+    /// </summary>
     public List<TableField> Fields { get; }
 }
