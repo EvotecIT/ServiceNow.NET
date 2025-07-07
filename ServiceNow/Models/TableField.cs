@@ -14,6 +14,13 @@ public class TableField {
         Type = type;
     }
 
+    /// <summary>
+    /// Gets the field name.
+    /// </summary>
     public string Name { get; }
+
+    /// <summary>
+    /// Gets the field type.
+    /// </summary>
     public string Type { get; }
 }
