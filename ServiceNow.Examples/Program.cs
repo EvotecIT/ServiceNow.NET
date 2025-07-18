@@ -51,6 +51,13 @@ Console.WriteLine(JsonSerializer.Serialize(
     report,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Calling scripted REST API...");
+var scriptClient = provider.GetRequiredService<ScriptedRestClient>();
+var scriptResult = await scriptClient.GetAsync<Dictionary<string, object>>("/api/x_my_app/endpoint", CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    scriptResult,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
 Console.WriteLine("Creating record...");
 var payload = new Dictionary<string, string?> { ["short_description"] = "Created via example" };
 await tableClient.CreateRecordAsync("incident", payload, CancellationToken.None);

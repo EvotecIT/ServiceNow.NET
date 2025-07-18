@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<ReportApiClient>();
         services.AddTransient<CmdbRelationsClient>();
         services.AddTransient<DataExportClient>();
+        services.AddTransient<ScriptedRestClient>();
         return services;
     }
 }
