@@ -50,6 +50,7 @@ public class TableApiClientTests {
 
         Assert.Equal(HttpMethod.Post, mock.LastMethod);
         Assert.Equal("/api/now/v2/table/task", mock.LastRelativeUrl);
+        Assert.NotNull(mock.LastPayload);
     }
 
     [Fact]
@@ -60,6 +61,7 @@ public class TableApiClientTests {
 
         Assert.Equal(HttpMethod.Put, mock.LastMethod);
         Assert.Equal("/api/now/v2/table/task/2", mock.LastRelativeUrl);
+        Assert.NotNull(mock.LastPayload);
     }
 
     [Fact]

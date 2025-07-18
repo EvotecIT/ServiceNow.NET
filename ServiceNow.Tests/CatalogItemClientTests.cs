@@ -46,6 +46,7 @@ public class CatalogItemClientTests {
 
         Assert.Equal(HttpMethod.Post, mock.LastMethod);
         Assert.Equal("/api/sn_sc/v1/catalog/items/2/order_now", mock.LastRelativeUrl);
+        Assert.NotNull(mock.LastPayload);
         Assert.Equal("R1", number);
     }
 }

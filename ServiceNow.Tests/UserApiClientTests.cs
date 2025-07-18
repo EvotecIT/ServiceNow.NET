@@ -37,6 +37,7 @@ public class UserApiClientTests {
 
         Assert.Equal(HttpMethod.Post, mock.LastMethod);
         Assert.Equal("/api/now/v1/table/sys_user", mock.LastRelativeUrl);
+        Assert.NotNull(mock.LastPayload);
     }
 
     [Fact]
@@ -47,6 +48,7 @@ public class UserApiClientTests {
 
         Assert.Equal(HttpMethod.Put, mock.LastMethod);
         Assert.Equal("/api/now/v1/table/sys_user_group/2", mock.LastRelativeUrl);
+        Assert.NotNull(mock.LastPayload);
     }
 
     [Fact]
