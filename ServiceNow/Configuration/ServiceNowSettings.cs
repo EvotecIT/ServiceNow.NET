@@ -73,4 +73,9 @@ public class ServiceNowSettings {
     /// ServiceNow REST API version segment. Defaults to "v2".
     /// </summary>
     public string ApiVersion { get; set; } = "v2";
+
+    /// <summary>
+    /// Duration to cache table metadata responses. Defaults to 10 minutes.
+    /// </summary>
+    public TimeSpan MetadataCacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 }
