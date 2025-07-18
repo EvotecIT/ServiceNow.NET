@@ -21,6 +21,7 @@ using var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var groupClient = provider.GetRequiredService<GroupApiClient>();
 var metaClient = provider.GetRequiredService<TableMetadataClient>();
+var assetClient = provider.GetRequiredService<AssetApiClient>();
 
 Console.WriteLine("Retrieving table metadata...");
 var meta = await metaClient.GetMetadataAsync("incident", CancellationToken.None);
@@ -42,6 +43,12 @@ Console.WriteLine("Retrieving user groups...");
 var groups = await groupClient.ListGroupsAsync(null, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
     groups,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Retrieving assets...");
+var assets = await assetClient.ListAssetsAsync(null, CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    assets,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Retrieving report...");
