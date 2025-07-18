@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<CatalogItemClient>();
         services.AddTransient<CatalogRequestClient>();
         services.AddTransient<EventApiClient>();
+        services.AddTransient<GroupApiClient>();
         services.AddTransient<UserApiClient>();
         services.AddTransient<ReportApiClient>();
         return services;

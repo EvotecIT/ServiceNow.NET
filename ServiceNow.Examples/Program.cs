@@ -17,6 +17,7 @@ var services = new ServiceCollection();
 services.AddServiceNow(settings);
 using var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
+var groupClient = provider.GetRequiredService<GroupApiClient>();
 
 Console.WriteLine("Retrieving problem...");
 var problem = await tableClient.GetRecordAsync<Problem>("problem", "example_sys_id", null, CancellationToken.None);
@@ -28,6 +29,12 @@ Console.WriteLine("Retrieving configuration items...");
 var cis = await tableClient.ListRecordsAsync<ConfigurationItem>("cmdb_ci", null, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
     cis,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Retrieving user groups...");
+var groups = await groupClient.ListGroupsAsync(null, CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    groups,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Retrieving report...");
