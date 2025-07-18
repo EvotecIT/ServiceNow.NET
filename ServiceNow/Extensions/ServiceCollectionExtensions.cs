@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<UserApiClient>();
         services.AddTransient<ReportApiClient>();
         services.AddTransient<CmdbRelationsClient>();
+        services.AddTransient<DataExportClient>();
         return services;
     }
 }

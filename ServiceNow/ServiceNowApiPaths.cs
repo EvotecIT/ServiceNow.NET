@@ -122,6 +122,16 @@ public static class ServiceNowApiPaths {
     public const string ImportSet = "/api/now/import/{0}";
 
     /// <summary>
+    /// Endpoint for starting a data export job.
+    /// </summary>
+    public const string DataExportStart = "/api/now/{0}/export";
+
+    /// <summary>
+    /// Format string for downloading an export file.
+    /// </summary>
+    public const string DataExportFile = "/api/now/{0}/export/{1}/file";
+
+    /// <summary>
     /// Format string for listing reports or analytics data.
     /// </summary>
     public const string Reports = "/api/now/{0}/report";
