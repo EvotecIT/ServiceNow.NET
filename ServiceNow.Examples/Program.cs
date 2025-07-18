@@ -51,4 +51,10 @@ await tableClient.CreateRecordAsync("incident", payload, CancellationToken.None)
 Console.WriteLine("Updating incident state...");
 await tableClient.SetStateAsync("incident", "example_sys_id", IncidentState.InProgress, CancellationToken.None);
 
+Console.WriteLine("Starting data export...");
+var exportClient = provider.GetRequiredService<DataExportClient>();
+var exportId = await exportClient.StartExportAsync(new { table = "incident" }, CancellationToken.None);
+var exportResponse = await exportClient.DownloadExportAsync(exportId, CancellationToken.None);
+Console.WriteLine($"Export {exportId} status: {exportResponse.StatusCode}");
+
 Console.WriteLine("Done");
