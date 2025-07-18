@@ -6,11 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
 using System.Text.Json;
 using ServiceNow.Utilities;
+using System.Linq;
 
 var settings = new ServiceNowSettings {
     BaseUrl = "https://instance.service-now.com",
     Username = "admin",
-    Password = "password"
+    Password = "password",
+    MetadataCacheDuration = TimeSpan.FromMinutes(5)
 };
 
 var services = new ServiceCollection();
@@ -18,6 +20,11 @@ services.AddServiceNow(settings);
 using var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var groupClient = provider.GetRequiredService<GroupApiClient>();
+var metaClient = provider.GetRequiredService<TableMetadataClient>();
+
+Console.WriteLine("Retrieving table metadata...");
+var meta = await metaClient.GetMetadataAsync("incident", CancellationToken.None);
+Console.WriteLine($"Fields: {string.Join(",", meta.Fields.Select(f => f.Name))}");
 
 Console.WriteLine("Retrieving problem...");
 var problem = await tableClient.GetRecordAsync<Problem>("problem", "example_sys_id", null, CancellationToken.None);

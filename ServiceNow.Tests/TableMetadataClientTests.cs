@@ -13,7 +13,8 @@ public class TableMetadataClientTests {
                 Content = new StringContent("{\"result\":[{\"element\":\"sys_id\",\"internal_type\":\"string\"}]}")
             }
         };
-        return (new TableMetadataClient(mock), mock);
+        var settings = new ServiceNowSettings();
+        return (new TableMetadataClient(mock, settings), mock);
     }
 
     [Fact]
@@ -36,7 +37,7 @@ public class TableMetadataClientTests {
                 Content = new StringContent("bad")
             }
         };
-        var client = new TableMetadataClient(mock);
+        var client = new TableMetadataClient(mock, new ServiceNowSettings());
 
         var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetMetadataAsync("task", CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
@@ -50,7 +51,7 @@ public class TableMetadataClientTests {
                 Content = new StringContent("{invalid")
             }
         };
-        var client = new TableMetadataClient(mock);
+        var client = new TableMetadataClient(mock, new ServiceNowSettings());
 
         await Assert.ThrowsAnyAsync<JsonException>(() => client.GetMetadataAsync("task", CancellationToken.None));
     }
@@ -65,10 +66,28 @@ public class TableMetadataClientTests {
             Password = "pass"
         };
         var snClient = new ServiceNowClient(http, settings);
-        var client = new TableMetadataClient(snClient);
+        var client = new TableMetadataClient(snClient, settings);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
         await Assert.ThrowsAsync<TaskCanceledException>(() => client.GetMetadataAsync("task", cts.Token));
+    }
+
+    [Fact]
+    public async Task GetMetadataAsync_UsesCache() {
+        var mock = new CountingServiceNowClient {
+            Response = new HttpResponseMessage(HttpStatusCode.OK) {
+                Content = new StringContent("{\"result\":[{\"element\":\"id\",\"internal_type\":\"string\"}]}")
+            }
+        };
+        var settings = new ServiceNowSettings { MetadataCacheDuration = TimeSpan.FromMinutes(5) };
+        var client = new TableMetadataClient(mock, settings);
+
+        var first = await client.GetMetadataAsync("task", CancellationToken.None);
+        mock.Response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+        var second = await client.GetMetadataAsync("task", CancellationToken.None);
+
+        Assert.Equal(1, mock.GetCount);
+        Assert.Same(first, second);
     }
 }
