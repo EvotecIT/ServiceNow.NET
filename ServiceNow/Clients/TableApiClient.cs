@@ -93,9 +93,11 @@ public class TableApiClient {
             if (records.Count == 0) {
                 yield break;
             }
-            foreach (var record in records) {
-                yield return record;
+
+            for (var i = 0; i < records.Count; i++) {
+                yield return records[i];
             }
+
             offset += records.Count;
         }
     }

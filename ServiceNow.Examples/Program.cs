@@ -44,6 +44,11 @@ Console.WriteLine(JsonSerializer.Serialize(
     groups,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Streaming incidents...");
+await foreach (var inc in tableClient.StreamRecordsAsync<Incident>("incident", 100, CancellationToken.None)) {
+    Console.WriteLine(inc.SysId);
+}
+
 Console.WriteLine("Retrieving report...");
 var reportClient = provider.GetRequiredService<ReportApiClient>();
 var report = await reportClient.GetReportAsync<Dictionary<string, object>>("daily_incidents", null, CancellationToken.None);

@@ -212,6 +212,47 @@ public class TableApiClientTests {
     }
 
     [Fact]
+    public async Task StreamRecordsAsync_LargeRecordCount_YieldsAllRecords() {
+        static string BuildJsonPage(int start, int count) {
+            var sb = new System.Text.StringBuilder();
+            sb.Append('[');
+            for (var i = start; i < start + count; i++) {
+                sb.Append($"{{\"SysId\":\"{i}\"}},");
+            }
+            if (count > 0) sb.Length--;
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        var handler = new SequenceMessageHandler();
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(BuildJsonPage(0, 100)) });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(BuildJsonPage(100, 100)) });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(BuildJsonPage(200, 50)) });
+        handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("[]") });
+
+        var http = new HttpClient(handler);
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass"
+        };
+        var snClient = new ServiceNowClient(http, settings);
+        var client = new TableApiClient(snClient, settings);
+
+        var list = new List<TaskRecord>();
+        await foreach (var r in client.StreamRecordsAsync<TaskRecord>("task", 100, CancellationToken.None)) {
+            list.Add(r);
+        }
+
+        Assert.Equal(250, list.Count);
+        Assert.Equal("0", list[0].SysId);
+        Assert.Equal("249", list[^1].SysId);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=100&sysparm_offset=0", handler.Requests[0].RequestUri?.PathAndQuery);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=100&sysparm_offset=100", handler.Requests[1].RequestUri?.PathAndQuery);
+        Assert.Equal("/api/now/v2/table/task?sysparm_limit=100&sysparm_offset=200", handler.Requests[2].RequestUri?.PathAndQuery);
+    }
+
+    [Fact]
     public async Task ListAllRecordsAsync_ReturnsRecordsAcrossPages() {
         var handler = new SequenceMessageHandler();
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
