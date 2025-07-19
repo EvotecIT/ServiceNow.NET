@@ -1,4 +1,5 @@
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -21,9 +22,6 @@ public class EventApiClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task SendEventAsync<T>(T payload, CancellationToken cancellationToken = default) {
         var response = await _client.PostAsync(ServiceNowApiPaths.EmEvent, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 }

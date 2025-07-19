@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Text.Json;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -24,10 +25,7 @@ public class ScriptedRestClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<T?> GetAsync<T>(string path, CancellationToken cancellationToken = default) {
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -40,10 +38,7 @@ public class ScriptedRestClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<T?> PostAsync<T>(string path, object payload, CancellationToken cancellationToken = default) {
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -56,10 +51,7 @@ public class ScriptedRestClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<T?> PutAsync<T>(string path, object payload, CancellationToken cancellationToken = default) {
         var response = await _client.PutAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -71,9 +63,6 @@ public class ScriptedRestClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task DeleteAsync(string path, CancellationToken cancellationToken = default) {
         var response = await _client.DeleteAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 }

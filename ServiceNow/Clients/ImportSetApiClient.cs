@@ -1,4 +1,5 @@
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -23,9 +24,6 @@ public class ImportSetApiClient {
     public async Task ImportAsync<T>(string table, T payload, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.ImportSet, table);
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 }

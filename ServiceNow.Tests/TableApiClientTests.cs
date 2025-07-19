@@ -2,6 +2,7 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
 using ServiceNow.Extensions;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -252,5 +253,22 @@ public class TableApiClientTests {
 
         var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.ListAllRecordsAsync<TaskRecord>("task", 1, CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.Unauthorized, typeof(ServiceNowAuthorizationException))]
+    [InlineData(HttpStatusCode.Forbidden, typeof(ServiceNowAuthorizationException))]
+    [InlineData(HttpStatusCode.NotFound, typeof(ServiceNowNotFoundException))]
+    [InlineData((HttpStatusCode)429, typeof(ServiceNowRateLimitException))]
+    [InlineData(HttpStatusCode.InternalServerError, typeof(ServiceNowServerException))]
+    public async Task GetRecordAsync_ThrowsSpecificExceptions(HttpStatusCode status, Type expected) {
+        var mock = new MockServiceNowClient {
+            Response = new HttpResponseMessage(status) { Content = new StringContent("bad") }
+        };
+        var client = new TableApiClient(mock, new ServiceNowSettings());
+
+        var ex = await Assert.ThrowsAsync(expected, () => client.GetRecordAsync<TaskRecord>("task", "1", null, CancellationToken.None));
+        var snEx = Assert.IsAssignableFrom<ServiceNowException>(ex);
+        Assert.Equal(status, snEx.StatusCode);
     }
 }

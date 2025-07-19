@@ -32,10 +32,7 @@ public class CatalogItemClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.CatalogItems, _settings.ApiVersion);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }
@@ -48,10 +45,7 @@ public class CatalogItemClient {
     public async Task<T?> GetItemAsync<T>(string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.CatalogItem, _settings.ApiVersion, sysId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -65,10 +59,7 @@ public class CatalogItemClient {
     public async Task<string> OrderItemAsync<T>(string sysId, T payload, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.CatalogItemOrder, _settings.ApiVersion, sysId);
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         if (doc.RootElement.TryGetProperty("result", out var result)) {

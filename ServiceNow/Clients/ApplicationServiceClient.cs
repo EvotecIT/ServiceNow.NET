@@ -31,10 +31,7 @@ public class ApplicationServiceClient {
     public async Task<ApplicationService?> GetServiceAsync(string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, "cmdb_ci_service", sysId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<ApplicationService>(json, ServiceNowJson.Default);
     }
@@ -48,10 +45,7 @@ public class ApplicationServiceClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.ApplicationService, _settings.ApiVersion);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<ApplicationService>>(json, ServiceNowJson.Default) ?? new();
     }
@@ -64,10 +58,7 @@ public class ApplicationServiceClient {
     public async Task<ServiceMap?> GetServiceMapAsync(string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.ServiceMap, _settings.ApiVersion, sysId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<ServiceMap>(json, ServiceNowJson.Default);
     }

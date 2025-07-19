@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ServiceNow.Configuration;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -30,10 +31,7 @@ public class WorkflowApiClient {
     public async Task<string> StartExecutionAsync(string workflowId, object payload, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.WorkflowStart, _settings.ApiVersion, workflowId);
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         if (doc.RootElement.TryGetProperty("result", out var result) &&
@@ -51,10 +49,7 @@ public class WorkflowApiClient {
     public async Task<string> GetExecutionStatusAsync(string executionId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.WorkflowExecution, _settings.ApiVersion, executionId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         if (doc.RootElement.TryGetProperty("result", out var result) &&

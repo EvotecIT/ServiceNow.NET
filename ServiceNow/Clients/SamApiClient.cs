@@ -31,10 +31,7 @@ public class SamApiClient {
     public async Task<SoftwareAsset?> GetSoftwareAssetAsync(string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.SamSoftwareAsset, _settings.ApiVersion, sysId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<SoftwareAsset>(json, ServiceNowJson.Default);
     }
@@ -48,10 +45,7 @@ public class SamApiClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.SamSoftwareAssets, _settings.ApiVersion);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<SoftwareAsset>>(json, ServiceNowJson.Default) ?? new();
     }

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using ServiceNow.Configuration;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -30,10 +31,7 @@ public class CatalogRequestClient {
     public async Task<T?> GetRequestAsync<T>(string requestId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.CatalogRequest, _settings.ApiVersion, requestId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -46,10 +44,7 @@ public class CatalogRequestClient {
     public async Task<List<T>> GetApprovalsAsync<T>(string requestId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.CatalogRequestApprovals, _settings.ApiVersion, requestId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }

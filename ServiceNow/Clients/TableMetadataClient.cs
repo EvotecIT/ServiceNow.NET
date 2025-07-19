@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using ServiceNow.Models;
 using ServiceNow.Configuration;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -35,10 +36,7 @@ public class TableMetadataClient {
 
         var path = string.Format(ServiceNowApiPaths.TableMetadata, table);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         var doc = JsonDocument.Parse(json);
         var list = new List<TableField>();
