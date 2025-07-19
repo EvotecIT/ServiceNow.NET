@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Text.Json;
 using ServiceNow.Configuration;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -30,10 +31,7 @@ public class DataExportClient {
     public async Task<string> StartExportAsync(object payload, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.DataExportStart, _settings.ApiVersion);
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
         if (doc.RootElement.TryGetProperty("result", out var result) &&
@@ -51,10 +49,7 @@ public class DataExportClient {
     public async Task<HttpResponseMessage> DownloadExportAsync(string exportId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.DataExportFile, _settings.ApiVersion, exportId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         return response;
     }
 }

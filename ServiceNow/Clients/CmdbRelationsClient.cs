@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ServiceNow.Configuration;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -30,10 +31,7 @@ public class CmdbRelationsClient {
     public async Task<List<T>> ListRelationshipsAsync<T>(string table, string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.CmdbRelationships, _settings.ApiVersion, table, sysId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }

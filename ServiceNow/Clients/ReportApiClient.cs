@@ -32,10 +32,7 @@ public class ReportApiClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.ReportRecord, _settings.ApiVersion, report);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -49,10 +46,7 @@ public class ReportApiClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.Reports, _settings.ApiVersion);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }

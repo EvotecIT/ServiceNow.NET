@@ -1,6 +1,7 @@
 using System.Text.Json;
 using ServiceNow.Configuration;
 using ServiceNow.Utilities;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -29,10 +30,7 @@ public class EmailApiClient {
     public async Task SendEmailAsync<T>(T payload, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.EmailOutbound, _settings.ApiVersion);
         var response = await _client.PostAsync(path, payload, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -43,10 +41,7 @@ public class EmailApiClient {
     public async Task<T?> GetInboundEmailAsync<T>(string emailId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.EmailInbound, _settings.ApiVersion, emailId);
         var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }

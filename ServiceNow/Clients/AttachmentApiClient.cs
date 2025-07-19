@@ -2,6 +2,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using ServiceNow.Configuration;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Clients;
 
@@ -53,7 +54,7 @@ public class AttachmentApiClient {
         content.Add(streamContent, "file", fileName);
 
         var response = await _client.PostAsync(string.Format(ServiceNowApiPaths.AttachmentFile, _settings.ApiVersion, table, sysId), content, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -63,6 +64,6 @@ public class AttachmentApiClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task DeleteAttachmentAsync(string sysId, CancellationToken cancellationToken = default) {
         var response = await _client.DeleteAsync(string.Format(ServiceNowApiPaths.Attachment, _settings.ApiVersion, sysId), cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 }

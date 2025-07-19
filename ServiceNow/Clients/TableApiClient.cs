@@ -35,10 +35,7 @@ public class TableApiClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<T>(json, ServiceNowJson.Default);
     }
@@ -53,10 +50,7 @@ public class TableApiClient {
         var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
         var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
     }
@@ -72,10 +66,7 @@ public class TableApiClient {
         var query = $"?sysparm_limit={limit}&sysparm_offset={offset}";
         var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new List<T>();
     }
@@ -123,10 +114,7 @@ public class TableApiClient {
     public async Task CreateRecordAsync<T>(string table, T record, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
         var response = await _client.PostAsync(path, record, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -139,10 +127,7 @@ public class TableApiClient {
     public async Task UpdateRecordAsync<T>(string table, string sysId, T record, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
         var response = await _client.PutAsync(path, record, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -154,9 +139,6 @@ public class TableApiClient {
     public async Task DeleteRecordAsync(string table, string sysId, CancellationToken cancellationToken = default) {
         var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
         var response = await _client.DeleteAsync(path, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) {
-            var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new ServiceNowException(response.StatusCode, text);
-        }
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
     }
 }
