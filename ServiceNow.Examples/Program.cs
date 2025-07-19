@@ -23,6 +23,7 @@ var tableClient = provider.GetRequiredService<TableApiClient>();
 var groupClient = provider.GetRequiredService<GroupApiClient>();
 var metaClient = provider.GetRequiredService<TableMetadataClient>();
 var samClient = provider.GetRequiredService<SamApiClient>();
+var grcClient = provider.GetRequiredService<GrcClient>();
 
 Console.WriteLine("Retrieving table metadata...");
 var meta = await metaClient.GetMetadataAsync("incident", CancellationToken.None);
@@ -51,6 +52,15 @@ var asset = await samClient.GetSoftwareAssetAsync("example_sys_id", Cancellation
 Console.WriteLine(JsonSerializer.Serialize(
     asset,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Retrieving GRC item...");
+var grc = await grcClient.GetItemAsync("example_sys_id", CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    grc,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Creating GRC item...");
+await grcClient.CreateItemAsync(new GrcItem { Name = "example" }, CancellationToken.None);
 
 Console.WriteLine("Retrieving report...");
 var reportClient = provider.GetRequiredService<ReportApiClient>();

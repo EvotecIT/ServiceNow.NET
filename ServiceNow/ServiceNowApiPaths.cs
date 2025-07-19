@@ -150,4 +150,14 @@ public static class ServiceNowApiPaths {
     /// Format string for listing software asset records.
     /// </summary>
     public const string SamSoftwareAssets = "/api/sn_sam/{0}/software";
+
+    /// <summary>
+    /// Format string for retrieving a GRC item record.
+    /// </summary>
+    public const string GrcItem = "/api/sn_grc/{0}/grc/items/{1}";
+
+    /// <summary>
+    /// Format string for creating or listing GRC items.
+    /// </summary>
+    public const string GrcItems = "/api/sn_grc/{0}/grc/items";
 }
