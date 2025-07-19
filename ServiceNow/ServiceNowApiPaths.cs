@@ -140,4 +140,14 @@ public static class ServiceNowApiPaths {
     /// Format string for retrieving a specific report or analytics dataset.
     /// </summary>
     public const string ReportRecord = "/api/now/{0}/report/{1}";
+
+    /// <summary>
+    /// Format string for retrieving a software asset record.
+    /// </summary>
+    public const string SamSoftwareAsset = "/api/sn_sam/{0}/software/{1}";
+
+    /// <summary>
+    /// Format string for listing software asset records.
+    /// </summary>
+    public const string SamSoftwareAssets = "/api/sn_sam/{0}/software";
 }

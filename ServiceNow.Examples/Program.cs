@@ -22,6 +22,7 @@ using var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var groupClient = provider.GetRequiredService<GroupApiClient>();
 var metaClient = provider.GetRequiredService<TableMetadataClient>();
+var samClient = provider.GetRequiredService<SamApiClient>();
 
 Console.WriteLine("Retrieving table metadata...");
 var meta = await metaClient.GetMetadataAsync("incident", CancellationToken.None);
@@ -43,6 +44,12 @@ Console.WriteLine("Retrieving user groups...");
 var groups = await groupClient.ListGroupsAsync(null, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
     groups,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
+Console.WriteLine("Retrieving software asset...");
+var asset = await samClient.GetSoftwareAssetAsync("example_sys_id", CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    asset,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Retrieving report...");
