@@ -4,6 +4,7 @@ using ServiceNow.Enums;
 using ServiceNow.Models;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
+using ServiceNow.Queries;
 using System.Text.Json;
 using ServiceNow.Utilities;
 using System.Linq;
@@ -72,3 +73,9 @@ var exportResponse = await exportClient.DownloadExportAsync(exportId, Cancellati
 Console.WriteLine($"Export {exportId} status: {exportResponse.StatusCode}");
 
 Console.WriteLine("Done");
+
+var dateQuery = new QueryBuilder()
+    .After("opened_at", new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero))
+    .Before("opened_at", new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero))
+    .ToQueryString();
+Console.WriteLine($"Date query: {dateQuery}");

@@ -23,4 +23,15 @@ public class QueryBuilderTests {
 
         Assert.Equal("state=1", qb.ToQueryString());
     }
+
+    [Fact]
+    public void BuildQuery_AfterBefore_GeneratesDateConditions() {
+        var qb = new QueryBuilder()
+            .After("opened_at", new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero))
+            .Before("opened_at", new DateTimeOffset(2024, 1, 31, 23, 59, 59, TimeSpan.Zero));
+
+        Assert.Equal(
+            "opened_at>=2024-01-01 00:00:00^opened_at<=2024-01-31 23:59:59",
+            qb.ToQueryString());
+    }
 }
