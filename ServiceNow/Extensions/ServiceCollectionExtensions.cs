@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<CmdbRelationsClient>();
         services.AddTransient<DataExportClient>();
         services.AddTransient<SamApiClient>();
+        services.AddTransient<GrcClient>();
         services.AddTransient<ScriptedRestClient>();
         return services;
     }
