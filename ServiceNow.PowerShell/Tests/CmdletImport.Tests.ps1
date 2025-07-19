@@ -18,4 +18,8 @@ Describe 'ServiceNow.PowerShell cmdlets' {
     It 'Remove-ServiceNowRecord is available' {
         Get-Command Remove-ServiceNowRecord | Should -Not -BeNullOrEmpty
     }
+
+    It 'Add-ServiceNowAttachment is available' {
+        Get-Command Add-ServiceNowAttachment | Should -Not -BeNullOrEmpty
+    }
 }
