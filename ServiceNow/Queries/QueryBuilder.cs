@@ -23,6 +23,22 @@ public sealed class QueryBuilder {
     }
 
     /// <summary>
+    /// Adds a condition requiring <paramref name="field"/> to be on or after the specified date.
+    /// </summary>
+    /// <param name="field">Field name.</param>
+    /// <param name="date">Date to compare.</param>
+    public QueryBuilder After(string field, DateTimeOffset date)
+        => And($"{field}>={date:yyyy-MM-dd HH:mm:ss}");
+
+    /// <summary>
+    /// Adds a condition requiring <paramref name="field"/> to be on or before the specified date.
+    /// </summary>
+    /// <param name="field">Field name.</param>
+    /// <param name="date">Date to compare.</param>
+    public QueryBuilder Before(string field, DateTimeOffset date)
+        => And($"{field}<={date:yyyy-MM-dd HH:mm:ss}");
+
+    /// <summary>
     /// Adds a condition preceded by the '^OR' operator.
     /// </summary>
     /// <param name="condition">Query condition.</param>
