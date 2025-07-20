@@ -160,4 +160,14 @@ public static class ServiceNowApiPaths {
     /// Format string for creating or listing GRC items.
     /// </summary>
     public const string GrcItems = "/api/sn_grc/{0}/grc/items";
+
+    /// <summary>
+    /// Format string for retrieving a resource plan record.
+    /// </summary>
+    public const string ResourcePlan = "/api/sn_rm/{0}/resource/plan/{1}";
+
+    /// <summary>
+    /// Format string for listing resource plan records.
+    /// </summary>
+    public const string ResourcePlans = "/api/sn_rm/{0}/resource/plan";
 }
