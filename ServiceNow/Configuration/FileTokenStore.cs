@@ -20,20 +20,24 @@ public class FileTokenStore : ITokenStore
     public FileTokenStore(string path) => _path = path;
 
     /// <inheritdoc />
-    public Task<TokenInfo?> LoadAsync(CancellationToken cancellationToken)
+    public async Task<TokenInfo?> LoadAsync(CancellationToken cancellationToken)
     {
         if (!File.Exists(_path))
         {
-            return Task.FromResult<TokenInfo?>(null);
+            return null;
         }
 
-        var json = File.ReadAllText(_path);
+#if NET6_0_OR_GREATER
+        var json = await File.ReadAllTextAsync(_path, cancellationToken).ConfigureAwait(false);
+#else
+        var json = await Task.Run(() => File.ReadAllText(_path), cancellationToken).ConfigureAwait(false);
+#endif
         var token = JsonSerializer.Deserialize<TokenInfo>(json, ServiceNowJson.Default);
-        return Task.FromResult(token);
+        return token;
     }
 
     /// <inheritdoc />
-    public Task SaveAsync(TokenInfo token, CancellationToken cancellationToken)
+    public async Task SaveAsync(TokenInfo token, CancellationToken cancellationToken)
     {
         var dir = Path.GetDirectoryName(_path);
         if (!string.IsNullOrEmpty(dir))
@@ -42,7 +46,10 @@ public class FileTokenStore : ITokenStore
         }
 
         var json = JsonSerializer.Serialize(token, ServiceNowJson.Default);
-        File.WriteAllText(_path, json);
-        return Task.CompletedTask;
+#if NET6_0_OR_GREATER
+        await File.WriteAllTextAsync(_path, json, cancellationToken).ConfigureAwait(false);
+#else
+        await Task.Run(() => File.WriteAllText(_path, json), cancellationToken).ConfigureAwait(false);
+#endif
     }
 }
