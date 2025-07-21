@@ -20,7 +20,7 @@ public class ServiceNowClient : IServiceNowClient {
     public const string HttpClientName = "ServiceNow";
 
     private readonly HttpClient _httpClient;
-    private readonly ServiceNowSettings _settings;
+    private ServiceNowSettings _settings;
 
     public ServiceNowSettings Settings => _settings;
 
@@ -46,9 +46,11 @@ public class ServiceNowClient : IServiceNowClient {
         if (string.IsNullOrEmpty(_settings.Token) && _settings.TokenStore is not null) {
             var stored = await _settings.TokenStore.LoadAsync(cancellationToken).ConfigureAwait(false);
             if (stored is not null) {
-                _settings.Token = stored.AccessToken;
-                _settings.RefreshToken = stored.RefreshToken;
-                _settings.TokenExpires = stored.Expires;
+                _settings = _settings with {
+                    Token = stored.AccessToken,
+                    RefreshToken = stored.RefreshToken,
+                    TokenExpires = stored.Expires
+                };
             }
         }
 
@@ -106,16 +108,23 @@ public class ServiceNowClient : IServiceNowClient {
 
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         using var doc = JsonDocument.Parse(json);
-        _settings.Token = doc.RootElement.GetProperty("access_token").GetString();
+        var token = doc.RootElement.GetProperty("access_token").GetString();
+        string? refresh = null;
         if (doc.RootElement.TryGetProperty("refresh_token", out var rt)) {
-            _settings.RefreshToken = rt.GetString();
+            refresh = rt.GetString();
         }
+        DateTimeOffset expires;
         if (doc.RootElement.TryGetProperty("expires_in", out var exp)) {
             var seconds = exp.GetInt32();
-            _settings.TokenExpires = DateTimeOffset.UtcNow.AddSeconds(seconds);
+            expires = DateTimeOffset.UtcNow.AddSeconds(seconds);
         } else {
-            _settings.TokenExpires = DateTimeOffset.UtcNow.AddHours(1);
+            expires = DateTimeOffset.UtcNow.AddHours(1);
         }
+        _settings = _settings with {
+            Token = token,
+            RefreshToken = refresh,
+            TokenExpires = expires
+        };
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _settings.Token);
 

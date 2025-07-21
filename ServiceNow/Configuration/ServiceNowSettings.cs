@@ -3,7 +3,7 @@ namespace ServiceNow.Configuration;
 /// <summary>
 /// Settings used for connecting to a ServiceNow instance.
 /// </summary>
-public record ServiceNowSettings {
+public sealed record ServiceNowSettings {
     /// <summary>
     /// Base URL of the ServiceNow instance.
     /// </summary>
@@ -42,17 +42,17 @@ public record ServiceNowSettings {
     /// <summary>
     /// Access token retrieved from the OAuth endpoint.
     /// </summary>
-    public string? Token { get; set; }
+    public string? Token { get; init; }
 
     /// <summary>
     /// Refresh token used to obtain a new access token.
     /// </summary>
-    public string? RefreshToken { get; set; }
+    public string? RefreshToken { get; init; }
 
     /// <summary>
     /// Expiration time of the access token in UTC.
     /// </summary>
-    public DateTimeOffset TokenExpires { get; set; }
+    public DateTimeOffset TokenExpires { get; init; }
 
     /// <summary>
     /// Optional store used for persisting tokens.
