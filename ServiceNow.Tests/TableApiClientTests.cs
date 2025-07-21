@@ -5,6 +5,7 @@ using ServiceNow.Extensions;
 using System;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
 namespace ServiceNow.Tests;
@@ -18,6 +19,20 @@ public class TableApiClientTests {
         };
         var settings = new ServiceNowSettings { ApiVersion = version };
         return (new TableApiClient(mock, settings), mock);
+    }
+
+    private static TableApiClient CreateReal(HttpMessageHandler handler) {
+        var services = new ServiceCollection();
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user",
+            Password = "pass"
+        };
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        return provider.GetRequiredService<TableApiClient>();
     }
 
     [Fact]
@@ -124,14 +139,7 @@ public class TableApiClientTests {
     [Fact]
     public async Task GetRecordAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass"
-        };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient, settings);
+        var client = CreateReal(handler);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -173,14 +181,7 @@ public class TableApiClientTests {
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
             Content = new StringContent("[]")
         });
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass"
-        };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient, settings);
+        var client = CreateReal(handler);
 
         var list = new List<TaskRecord>();
         await foreach (var r in client.StreamRecordsAsync<TaskRecord>("task", 1, CancellationToken.None)) {
@@ -197,14 +198,7 @@ public class TableApiClientTests {
     public async Task StreamRecordsAsync_Error_ThrowsServiceNowException() {
         var handler = new SequenceMessageHandler();
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent("bad") });
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass"
-        };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient, settings);
+        var client = CreateReal(handler);
 
         var ex = await Assert.ThrowsAsync<ServiceNowException>(async () => {
             await foreach (var _ in client.StreamRecordsAsync<TaskRecord>("task", 1, CancellationToken.None)) { }
@@ -221,14 +215,7 @@ public class TableApiClientTests {
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
             Content = new StringContent("[]")
         });
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass"
-        };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient, settings);
+        var client = CreateReal(handler);
 
         var list = await client.ListAllRecordsAsync<TaskRecord>("task", 1, CancellationToken.None);
 
@@ -242,14 +229,7 @@ public class TableApiClientTests {
     public async Task ListAllRecordsAsync_Error_ThrowsServiceNowException() {
         var handler = new SequenceMessageHandler();
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent("bad") });
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass"
-        };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableApiClient(snClient, settings);
+        var client = CreateReal(handler);
 
         var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.ListAllRecordsAsync<TaskRecord>("task", 1, CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);

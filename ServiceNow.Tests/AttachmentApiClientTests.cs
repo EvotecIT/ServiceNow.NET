@@ -2,19 +2,25 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.IO;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Tests;
 
 public class AttachmentApiClientTests {
     private static AttachmentApiClient Create() {
         var handler = new MockHttpMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass"
         };
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = (ServiceNowClient)provider.GetRequiredService<IServiceNowClient>();
         return new AttachmentApiClient(client, settings);
     }
 

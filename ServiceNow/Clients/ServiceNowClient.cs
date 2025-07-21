@@ -14,6 +14,11 @@ namespace ServiceNow.Clients;
 /// Basic client for interacting with the ServiceNow REST API.
 /// </summary>
 public class ServiceNowClient : IServiceNowClient {
+    /// <summary>
+    /// Name used when configuring the underlying <see cref="HttpClient"/>.
+    /// </summary>
+    public const string HttpClientName = "ServiceNow";
+
     private readonly HttpClient _httpClient;
     private readonly ServiceNowSettings _settings;
 
@@ -31,15 +36,6 @@ public class ServiceNowClient : IServiceNowClient {
 
         _httpClient = httpClient;
         _settings = settings;
-
-        _httpClient.BaseAddress = new Uri(settings.BaseUrl);
-        _httpClient.Timeout = settings.Timeout;
-        if (!settings.UseOAuth) {
-            var authBytes = Encoding.ASCII.GetBytes($"{settings.Username}:{settings.Password}");
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));
-        }
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(settings.UserAgent);
     }
 
     private async Task EnsureTokenAsync(CancellationToken cancellationToken) {
