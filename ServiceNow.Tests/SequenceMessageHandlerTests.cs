@@ -5,8 +5,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
+using ServiceNow.Extensions;
 using Xunit;
 
 namespace ServiceNow.Tests;
@@ -16,13 +18,17 @@ public class SequenceMessageHandlerTests {
     public async Task PostAsync_RecordsJsonBodyAndHeaders() {
         var handler = new SequenceMessageHandler();
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") });
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass"
         };
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<IServiceNowClient>();
 
         await client.PostAsync("/api", new { Name = "foo" }, CancellationToken.None);
 

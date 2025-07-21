@@ -2,6 +2,8 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Text.Json;
 
 namespace ServiceNow.Tests;
@@ -59,14 +61,17 @@ public class TableMetadataClientTests {
     [Fact]
     public async Task GetMetadataAsync_CancelledRequest_Throws() {
         var handler = new CancelMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass"
         };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new TableMetadataClient(snClient, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<TableMetadataClient>();
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 

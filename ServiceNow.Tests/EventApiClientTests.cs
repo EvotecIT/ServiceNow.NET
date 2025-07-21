@@ -1,6 +1,8 @@
 using ServiceNow.Clients;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Tests;
 
@@ -38,10 +40,13 @@ public class EventApiClientTests {
     [Fact]
     public async Task SendEventAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNow.Configuration.ServiceNowSettings { BaseUrl = "https://example.com", Username = "u", Password = "p" };
-        var snClient = new ServiceNow.Clients.ServiceNowClient(http, settings);
-        var client = new EventApiClient(snClient);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNow.Clients.ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<EventApiClient>();
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 

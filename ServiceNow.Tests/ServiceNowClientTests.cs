@@ -4,57 +4,56 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 using System.Text.Json;
 
 namespace ServiceNow.Tests;
 
 public class ServiceNowClientTests {
-    private static ServiceNowClient CreateClient(MockHttpMessageHandler handler) {
-        var http = new HttpClient(handler);
+    private static ServiceNowClient CreateClient(HttpMessageHandler handler) {
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass",
             UserAgent = "TestAgent"
         };
-        return new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        return (ServiceNowClient)provider.GetRequiredService<IServiceNowClient>();
     }
 
     [Fact]
-    public void Constructor_SetsBaseAddressAndHeaders() {
+    public void AddServiceNow_ConfiguresHttpClient() {
         var handler = new MockHttpMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass",
+            Timeout = TimeSpan.FromSeconds(5),
             UserAgent = "TestAgent"
         };
 
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
 
-        Assert.Equal(new Uri("https://example.com"), http.BaseAddress);
-        Assert.Equal("Basic", http.DefaultRequestHeaders.Authorization?.Scheme);
-        var param = http.DefaultRequestHeaders.Authorization?.Parameter;
+        var provider = services.BuildServiceProvider();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+        var client = factory.CreateClient(ServiceNowClient.HttpClientName);
+
+        Assert.Equal(new Uri("https://example.com"), client.BaseAddress);
+        Assert.Equal(TimeSpan.FromSeconds(5), client.Timeout);
+        Assert.Equal("Basic", client.DefaultRequestHeaders.Authorization?.Scheme);
+        var param = client.DefaultRequestHeaders.Authorization?.Parameter;
         Assert.Equal(Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes("user:pass")), param);
-        Assert.Contains(http.DefaultRequestHeaders.UserAgent, h => h.Product?.Name == "TestAgent");
+        Assert.Contains(client.DefaultRequestHeaders.UserAgent, h => h.Product?.Name == "TestAgent");
     }
 
-    [Fact]
-    public void Constructor_SetsTimeout() {
-        var handler = new MockHttpMessageHandler();
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass",
-            Timeout = TimeSpan.FromSeconds(5)
-        };
-
-        _ = new ServiceNowClient(http, settings);
-
-        Assert.Equal(TimeSpan.FromSeconds(5), http.Timeout);
-    }
 
     [Fact]
     public void Constructor_NullBaseUrl_Throws() {
@@ -125,14 +124,7 @@ public class ServiceNowClientTests {
     [Fact]
     public async Task GetAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
-        var http = new HttpClient(handler);
-        var settings = new ServiceNowSettings {
-            BaseUrl = "https://example.com",
-            Username = "user",
-            Password = "pass",
-            UserAgent = "TestAgent"
-        };
-        var client = new ServiceNowClient(http, settings);
+        var client = CreateClient(handler);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -143,14 +135,17 @@ public class ServiceNowClientTests {
     [Fact]
     public async Task GetAsync_UsesBearerToken_WhenProvided() {
         var handler = new MockHttpMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             UseOAuth = true,
             Token = "abc"
         };
-
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<IServiceNowClient>();
         await client.GetAsync("/path", CancellationToken.None);
 
         Assert.Equal("Bearer", handler.LastRequest?.Headers.Authorization?.Scheme);
@@ -166,7 +161,7 @@ public class ServiceNowClientTests {
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) {
             Content = new StringContent("{}")
         });
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             UseOAuth = true,
@@ -174,7 +169,11 @@ public class ServiceNowClientTests {
             ClientSecret = "secret",
             TokenUrl = "https://example.com/token"
         };
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<IServiceNowClient>();
 
         await client.GetAsync("/resource", CancellationToken.None);
 
@@ -193,13 +192,17 @@ public class ServiceNowClientTests {
             }
         };
         var handler = new MockHttpMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             UseOAuth = true,
             TokenStore = store
         };
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<IServiceNowClient>();
 
         await client.GetAsync("/path", CancellationToken.None);
 
@@ -214,7 +217,7 @@ public class ServiceNowClientTests {
             Content = new StringContent("{\"access_token\":\"new\",\"refresh_token\":\"r2\",\"expires_in\":3600}")
         });
         handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") });
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var store = new InMemoryTokenStore {
             Token = new TokenInfo {
                 AccessToken = "old",
@@ -228,7 +231,11 @@ public class ServiceNowClientTests {
             TokenUrl = "https://example.com/token",
             TokenStore = store
         };
-        var client = new ServiceNowClient(http, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<IServiceNowClient>();
 
         await client.GetAsync("/resource", CancellationToken.None);
 

@@ -2,6 +2,8 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.Net;
 using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceNow.Extensions;
 
 namespace ServiceNow.Tests;
 
@@ -72,14 +74,17 @@ public class WorkflowApiClientTests {
     [Fact]
     public async Task StartExecutionAsync_CancelledToken_Throws() {
         var handler = new CancelMessageHandler();
-        var http = new HttpClient(handler);
+        var services = new ServiceCollection();
         var settings = new ServiceNowSettings {
             BaseUrl = "https://example.com",
             Username = "user",
             Password = "pass"
         };
-        var snClient = new ServiceNowClient(http, settings);
-        var client = new WorkflowApiClient(snClient, settings);
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+        var provider = services.BuildServiceProvider();
+        var client = provider.GetRequiredService<WorkflowApiClient>();
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
