@@ -66,6 +66,12 @@ Console.WriteLine(JsonSerializer.Serialize(
     plan,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Serializing catalog approval...");
+var approvalSample = new CatalogApproval { State = CatalogApprovalState.Approved };
+Console.WriteLine(JsonSerializer.Serialize(
+    approvalSample,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
 Console.WriteLine("Creating GRC item...");
 await grcClient.CreateItemAsync(new GrcItem { Name = "example" }, CancellationToken.None);
 

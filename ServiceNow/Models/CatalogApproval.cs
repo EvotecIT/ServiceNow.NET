@@ -1,3 +1,5 @@
+using ServiceNow.Enums;
+
 namespace ServiceNow.Models;
 
 /// <summary>
@@ -12,5 +14,5 @@ public class CatalogApproval {
     /// <summary>
     /// Gets or sets the current approval state.
     /// </summary>
-    public string? State { get; set; }
+    public CatalogApprovalState State { get; set; }
 }
