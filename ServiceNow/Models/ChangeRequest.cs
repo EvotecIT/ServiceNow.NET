@@ -1,3 +1,5 @@
+using ServiceNow.Enums;
+
 namespace ServiceNow.Models;
 
 /// <summary>
@@ -18,4 +20,9 @@ public class ChangeRequest {
     /// Gets or sets the short description of the request.
     /// </summary>
     public string? ShortDescription { get; set; }
+
+    /// <summary>
+    /// Gets or sets the current change request state.
+    /// </summary>
+    public ChangeRequestState State { get; set; }
 }
