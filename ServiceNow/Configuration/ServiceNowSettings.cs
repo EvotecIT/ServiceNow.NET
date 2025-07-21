@@ -3,41 +3,41 @@ namespace ServiceNow.Configuration;
 /// <summary>
 /// Settings used for connecting to a ServiceNow instance.
 /// </summary>
-public class ServiceNowSettings {
+public record ServiceNowSettings {
     /// <summary>
     /// Base URL of the ServiceNow instance.
     /// </summary>
-    public string? BaseUrl { get; set; }
+    public string? BaseUrl { get; init; }
 
     /// <summary>
     /// Username used for authentication.
     /// </summary>
-    public string? Username { get; set; }
+    public string? Username { get; init; }
 
     /// <summary>
     /// Password used for authentication.
     /// </summary>
-    public string? Password { get; set; }
+    public string? Password { get; init; }
 
     /// <summary>
     /// Use OAuth authentication instead of basic auth.
     /// </summary>
-    public bool UseOAuth { get; set; }
+    public bool UseOAuth { get; init; }
 
     /// <summary>
     /// OAuth client identifier.
     /// </summary>
-    public string? ClientId { get; set; }
+    public string? ClientId { get; init; }
 
     /// <summary>
     /// OAuth client secret.
     /// </summary>
-    public string? ClientSecret { get; set; }
+    public string? ClientSecret { get; init; }
 
     /// <summary>
     /// Token endpoint used when obtaining an OAuth token.
     /// </summary>
-    public string TokenUrl { get; set; } = "/oauth_token.do";
+    public string TokenUrl { get; init; } = "/oauth_token.do";
 
     /// <summary>
     /// Access token retrieved from the OAuth endpoint.
@@ -57,25 +57,25 @@ public class ServiceNowSettings {
     /// <summary>
     /// Optional store used for persisting tokens.
     /// </summary>
-    public ITokenStore? TokenStore { get; set; }
+    public ITokenStore? TokenStore { get; init; }
 
     /// <summary>
     /// Optional custom user agent string.
     /// </summary>
-    public string UserAgent { get; set; } = "ServiceNow.NET";
+    public string UserAgent { get; init; } = "ServiceNow.NET";
 
     /// <summary>
     /// Timeout for HTTP requests. Defaults to 100 seconds.
     /// </summary>
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(100);
+    public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(100);
 
     /// <summary>
     /// ServiceNow REST API version segment. Defaults to "v2".
     /// </summary>
-    public string ApiVersion { get; set; } = "v2";
+    public string ApiVersion { get; init; } = "v2";
 
     /// <summary>
     /// Duration to cache table metadata responses. Defaults to 10 minutes.
     /// </summary>
-    public TimeSpan MetadataCacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+    public TimeSpan MetadataCacheDuration { get; init; } = TimeSpan.FromMinutes(10);
 }
