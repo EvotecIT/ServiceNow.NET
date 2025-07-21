@@ -52,7 +52,7 @@ services.AddServiceNow(new ServiceNowSettings {
 var provider = services.BuildServiceProvider();
 var tableClient = provider.GetRequiredService<TableApiClient>();
 var problem = await tableClient.GetRecordAsync<Problem>("problem", "abc123", null, CancellationToken.None);
-var recent = await tableClient.GetRecordsAsync<TaskRecord>("task", 10, 0, CancellationToken.None);
+var recent = await tableClient.PageRecordsAsync<TaskRecord>("task", 10, 0, CancellationToken.None);
 await foreach (var rec in tableClient.StreamRecordsAsync<TaskRecord>("task", 50, CancellationToken.None)) {
     Console.WriteLine(rec.SysId);
 }
