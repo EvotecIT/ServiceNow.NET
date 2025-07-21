@@ -46,9 +46,7 @@ getCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
-    var services = new ServiceCollection();
-    services.AddServiceNow(settings);
-    using var provider = services.BuildServiceProvider();
+    using var provider = BuildProvider(settings);
     var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = await tableClient.GetRecordAsync<TaskRecord>(table, sysId, filters, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(
@@ -74,9 +72,7 @@ createCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
-    var services = new ServiceCollection();
-    services.AddServiceNow(settings);
-    using var provider = services.BuildServiceProvider();
+    using var provider = BuildProvider(settings);
     var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
@@ -104,9 +100,7 @@ updateCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
-    var services = new ServiceCollection();
-    services.AddServiceNow(settings);
-    using var provider = services.BuildServiceProvider();
+    using var provider = BuildProvider(settings);
     var tableClient = provider.GetRequiredService<TableApiClient>();
     var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
     await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
@@ -135,9 +129,7 @@ listCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
-    var services = new ServiceCollection();
-    services.AddServiceNow(settings);
-    using var provider = services.BuildServiceProvider();
+    using var provider = BuildProvider(settings);
     var tableClient = provider.GetRequiredService<TableApiClient>();
     var records = await tableClient.ListRecordsAsync<TaskRecord>(table, filters, cancellationToken).ConfigureAwait(false);
     Console.WriteLine(JsonSerializer.Serialize(
@@ -163,9 +155,7 @@ genCmd.SetHandler(async (InvocationContext ctx) => {
     var cancellationToken = ctx.GetCancellationToken();
 
     var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
-    var services = new ServiceCollection();
-    services.AddServiceNow(settings);
-    using var provider = services.BuildServiceProvider();
+    using var provider = BuildProvider(settings);
     var metaClient = provider.GetRequiredService<TableMetadataClient>();
     var metadata = await metaClient.GetMetadataAsync(table, cancellationToken).ConfigureAwait(false);
     var code = GenerateClass(metadata);
@@ -176,6 +166,13 @@ genCmd.SetHandler(async (InvocationContext ctx) => {
 root.AddCommand(genCmd);
 
 return await root.InvokeAsync(args);
+
+static ServiceProvider BuildProvider(ServiceNowSettings settings)
+{
+    var services = new ServiceCollection();
+    services.AddServiceNow(settings);
+    return services.BuildServiceProvider();
+}
 
 static Dictionary<string, string?> ParseFilters(IEnumerable<string> pairs) {
     var dict = new Dictionary<string, string?>();
