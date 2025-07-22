@@ -39,7 +39,8 @@ public static class ServiceCollectionExtensions {
             var factory = sp.GetRequiredService<IHttpClientFactory>();
             var http = factory.CreateClient(ServiceNowClient.HttpClientName);
             var opts = sp.GetRequiredService<ServiceNowSettings>();
-            return new ServiceNowClient(http, opts);
+            var tokenService = new TokenService(http, opts);
+            return new ServiceNowClient(http, opts, tokenService);
         });
 
         services.AddTransient<TableApiClient>();

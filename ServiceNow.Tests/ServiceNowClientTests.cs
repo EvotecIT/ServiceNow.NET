@@ -61,7 +61,8 @@ public class ServiceNowClientTests {
         var http = new HttpClient(handler);
         var settings = new ServiceNowSettings { Username = "user", Password = "pass" };
 
-        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings));
+        var tokenService = new TokenService(http, settings);
+        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings, tokenService));
     }
 
     [Fact]
@@ -70,7 +71,8 @@ public class ServiceNowClientTests {
         var http = new HttpClient(handler);
         var settings = new ServiceNowSettings { BaseUrl = string.Empty, Username = "user", Password = "pass" };
 
-        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings));
+        var tokenService = new TokenService(http, settings);
+        Assert.Throws<ArgumentException>(() => new ServiceNowClient(http, settings, tokenService));
     }
 
     [Fact]

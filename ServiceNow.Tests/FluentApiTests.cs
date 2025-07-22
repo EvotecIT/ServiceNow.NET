@@ -12,7 +12,8 @@ public class FluentApiTests {
             Username = "user",
             Password = "pass"
         };
-        var client = new ServiceNow.Clients.ServiceNowClient(http, settings);
+        var tokenService = new ServiceNow.Clients.TokenService(http, settings);
+        var client = new ServiceNow.Clients.ServiceNowClient(http, settings, tokenService);
         var builder = client.Table<Dictionary<string, string?>>("incident");
         Assert.NotNull(builder);
         Assert.Equal("incident", builder.TableName);
