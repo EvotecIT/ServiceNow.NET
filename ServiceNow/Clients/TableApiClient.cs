@@ -62,7 +62,7 @@ public class TableApiClient {
     /// <param name="limit">Maximum records to return.</param>
     /// <param name="offset">Record offset.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<IReadOnlyList<T>> GetRecordsAsync<T>(string table, int limit, int offset, CancellationToken cancellationToken = default) {
+    public async Task<IReadOnlyList<T>> PageRecordsAsync<T>(string table, int limit, int offset, CancellationToken cancellationToken = default) {
         var query = $"?sysparm_limit={limit}&sysparm_offset={offset}";
         var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
@@ -80,7 +80,7 @@ public class TableApiClient {
     public async IAsyncEnumerable<T> StreamRecordsAsync<T>(string table, int batchSize = 100, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
         var offset = 0;
         while (true) {
-            var records = await GetRecordsAsync<T>(table, batchSize, offset, cancellationToken).ConfigureAwait(false);
+            var records = await PageRecordsAsync<T>(table, batchSize, offset, cancellationToken).ConfigureAwait(false);
             if (records.Count == 0) {
                 yield break;
             }

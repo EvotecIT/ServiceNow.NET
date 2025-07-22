@@ -148,11 +148,11 @@ public class TableApiClientTests {
     }
 
     [Fact]
-    public async Task GetRecordsAsync_SendsLimitAndOffset() {
+    public async Task PageRecordsAsync_SendsLimitAndOffset() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("[]");
 
-        var records = await client.GetRecordsAsync<TaskRecord>("task", 5, 10, CancellationToken.None);
+        var records = await client.PageRecordsAsync<TaskRecord>("task", 5, 10, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
         Assert.Equal("/api/now/v2/table/task?sysparm_limit=5&sysparm_offset=10", mock.LastRelativeUrl);
@@ -160,7 +160,7 @@ public class TableApiClientTests {
     }
 
     [Fact]
-    public async Task GetRecordsAsync_ErrorResponse_ThrowsServiceNowException() {
+    public async Task PageRecordsAsync_ErrorResponse_ThrowsServiceNowException() {
         var mock = new MockServiceNowClient {
             Response = new HttpResponseMessage(HttpStatusCode.BadRequest) {
                 Content = new StringContent("bad")
@@ -168,7 +168,7 @@ public class TableApiClientTests {
         };
         var client = new TableApiClient(mock, new ServiceNowSettings());
 
-        var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.GetRecordsAsync<TaskRecord>("task", 1, 0, CancellationToken.None));
+        var ex = await Assert.ThrowsAsync<ServiceNowException>(() => client.PageRecordsAsync<TaskRecord>("task", 1, 0, CancellationToken.None));
         Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
         Assert.Equal("bad", ex.Content);
     }
