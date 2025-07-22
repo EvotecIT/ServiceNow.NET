@@ -22,6 +22,13 @@ public class JsonSerializationTests {
     }
 
     [Fact]
+    public void Serialize_ChangeRequest_UsesEnumMemberValues() {
+        var cr = new ChangeRequest { State = ChangeRequestState.Authorize };
+        var json = JsonSerializer.Serialize(cr, ServiceNowJson.Default);
+        Assert.Contains("\"State\":\"Authorize\"", json);
+    }
+
+    [Fact]
     public void Deserialize_UsesEnumMemberValues() {
         const string json = "{\"State\":\"Resolved\"}";
         var incident = JsonSerializer.Deserialize<Incident>(json, ServiceNowJson.Default);
@@ -35,5 +42,13 @@ public class JsonSerializationTests {
         var approval = JsonSerializer.Deserialize<CatalogApproval>(json, ServiceNowJson.Default);
         Assert.NotNull(approval);
         Assert.Equal(CatalogApprovalState.Rejected, approval!.State);
+    }
+
+    [Fact]
+    public void Deserialize_ChangeRequest_UsesEnumMemberValues() {
+        const string json = "{\"State\":\"Scheduled\"}";
+        var cr = JsonSerializer.Deserialize<ChangeRequest>(json, ServiceNowJson.Default);
+        Assert.NotNull(cr);
+        Assert.Equal(ChangeRequestState.Scheduled, cr!.State);
     }
 }
