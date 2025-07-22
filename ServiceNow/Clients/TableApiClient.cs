@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using ServiceNow.Extensions;
 using ServiceNow.Utilities;
 using ServiceNow.Configuration;
+using ServiceNow;
 
 namespace ServiceNow.Clients;
 
@@ -29,10 +30,11 @@ public class TableApiClient {
     /// </summary>
     /// <param name="table">Table name.</param>
     /// <param name="sysId">Record sys_id.</param>
-    /// <param name="filters">Optional query filters.</param>
+    /// <param name="options">Optional query options.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<T?> GetRecordAsync<T>(string table, string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default) {
-        var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
+    public async Task<T?> GetRecordAsync<T>(string table, string sysId, TableQueryOptions? options = null, CancellationToken cancellationToken = default) {
+        var query = options?.ToQueryString();
+        query = string.IsNullOrEmpty(query) ? string.Empty : $"?{query}";
         var path = string.Format(ServiceNowApiPaths.TableRecord, _settings.ApiVersion, table, sysId);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
@@ -44,10 +46,11 @@ public class TableApiClient {
     /// Lists records from a table.
     /// </summary>
     /// <param name="table">Table name.</param>
-    /// <param name="filters">Optional query filters.</param>
+    /// <param name="options">Optional query options.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<List<T>> ListRecordsAsync<T>(string table, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default) {
-        var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
+    public async Task<List<T>> ListRecordsAsync<T>(string table, TableQueryOptions? options = null, CancellationToken cancellationToken = default) {
+        var query = options?.ToQueryString();
+        query = string.IsNullOrEmpty(query) ? string.Empty : $"?{query}";
         var path = string.Format(ServiceNowApiPaths.Table, _settings.ApiVersion, table);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);

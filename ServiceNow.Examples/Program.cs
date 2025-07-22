@@ -5,6 +5,7 @@ using ServiceNow.Models;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Extensions;
 using ServiceNow.Queries;
+using ServiceNow;
 using System.Text.Json;
 using ServiceNow.Utilities;
 using System.Linq;
@@ -37,7 +38,8 @@ Console.WriteLine(JsonSerializer.Serialize(
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
 Console.WriteLine("Retrieving configuration items...");
-var cis = await tableClient.ListRecordsAsync<ConfigurationItem>("cmdb_ci", null, CancellationToken.None);
+var options = new TableQueryOptions { Fields = ["sys_id", "name"] };
+var cis = await tableClient.ListRecordsAsync<ConfigurationItem>("cmdb_ci", options, CancellationToken.None);
 Console.WriteLine(JsonSerializer.Serialize(
     cis,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));

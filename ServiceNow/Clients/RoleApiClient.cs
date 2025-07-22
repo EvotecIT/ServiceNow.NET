@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ServiceNow.Configuration;
-using ServiceNow.Extensions;
+using ServiceNow;
 using ServiceNow.Models;
 
 namespace ServiceNow.Clients;
@@ -29,12 +29,12 @@ public class RoleApiClient {
     /// <summary>
     /// Retrieves a sys_user_role record.
     /// </summary>
-    public Task<SysUserRole?> GetRoleAsync(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+    public Task<SysUserRole?> GetRoleAsync(string sysId, TableQueryOptions? filters = null, CancellationToken cancellationToken = default)
         => TableClient.GetRecordAsync<SysUserRole>("sys_user_role", sysId, filters, cancellationToken);
 
     /// <summary>
     /// Lists sys_user_role records.
     /// </summary>
-    public Task<List<SysUserRole>> ListRolesAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+    public Task<List<SysUserRole>> ListRolesAsync(TableQueryOptions? filters = null, CancellationToken cancellationToken = default)
         => TableClient.ListRecordsAsync<SysUserRole>("sys_user_role", filters, cancellationToken);
 }

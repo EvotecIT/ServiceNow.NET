@@ -1,11 +1,13 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
+using ServiceNow;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using ServiceNow.Utilities;
+using System.Collections.Generic;
 
 namespace ServiceNow.CLI.Commands;
 
@@ -32,7 +34,8 @@ internal sealed class ListRecordsCommand : Command
         {
             var table = ctx.ParseResult.GetValueForArgument(tableArg);
             var filterPairs = ctx.ParseResult.GetValueForOption(filterOpt) ?? Array.Empty<string>();
-            var filters = CommandHelpers.ParseFilters(filterPairs);
+            var filterDict = CommandHelpers.ParseFilters(filterPairs);
+            var options = new TableQueryOptions { AdditionalParameters = new Dictionary<string, string?>(filterDict) };
             var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
             var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
             var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
@@ -43,7 +46,7 @@ internal sealed class ListRecordsCommand : Command
             var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
             using var provider = CommandHelpers.BuildProvider(settings);
             var tableClient = provider.GetRequiredService<TableApiClient>();
-            var records = await tableClient.ListRecordsAsync<TaskRecord>(table, filters, cancellationToken).ConfigureAwait(false);
+            var records = await tableClient.ListRecordsAsync<TaskRecord>(table, options, cancellationToken).ConfigureAwait(false);
             Console.WriteLine(JsonSerializer.Serialize(records, new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
         });
     }
