@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ServiceNow.Configuration;
 using ServiceNow.Extensions;
 using ServiceNow.Models;
+using ServiceNow;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -94,4 +96,46 @@ internal static class CommandHelpers
         "glide_date" => "DateTime?",
         _ => "string?"
     };
+
+    internal static TableQueryOptions ParseQueryOptions(IEnumerable<string> pairs)
+    {
+        var dict = ParseFilters(pairs);
+
+        string? fields = null;
+        if (dict.TryGetValue("sysparm_fields", out var f) || dict.TryGetValue("fields", out f))
+        {
+            fields = f;
+            dict.Remove("sysparm_fields");
+            dict.Remove("fields");
+        }
+
+        string? dv = null;
+        if (dict.TryGetValue("sysparm_display_value", out var dvTemp) || dict.TryGetValue("display_value", out dvTemp))
+        {
+            dv = dvTemp;
+            dict.Remove("sysparm_display_value");
+            dict.Remove("display_value");
+        }
+
+        bool? erl = null;
+        if (dict.TryGetValue("sysparm_exclude_reference_link", out var ex) || dict.TryGetValue("exclude_reference_link", out ex))
+        {
+            if (bool.TryParse(ex, out var b))
+            {
+                erl = b;
+            }
+            dict.Remove("sysparm_exclude_reference_link");
+            dict.Remove("exclude_reference_link");
+        }
+
+        var additional = new Dictionary<string, string?>(dict);
+
+        return new TableQueryOptions
+        {
+            Fields = fields?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries),
+            DisplayValue = dv,
+            ExcludeReferenceLinks = erl,
+            AdditionalParameters = additional
+        };
+    }
 }

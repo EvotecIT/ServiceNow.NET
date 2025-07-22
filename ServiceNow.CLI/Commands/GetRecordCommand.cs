@@ -7,7 +7,6 @@ using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using ServiceNow.Utilities;
-using System.Collections.Generic;
 
 namespace ServiceNow.CLI.Commands;
 
@@ -37,8 +36,7 @@ internal sealed class GetRecordCommand : Command
             var table = ctx.ParseResult.GetValueForArgument(tableArg);
             var sysId = ctx.ParseResult.GetValueForArgument(sysIdArg);
             var filterPairs = ctx.ParseResult.GetValueForOption(filterOpt) ?? Array.Empty<string>();
-            var filterDict = CommandHelpers.ParseFilters(filterPairs);
-            var options = new TableQueryOptions { AdditionalParameters = new Dictionary<string, string?>(filterDict) };
+            var options = CommandHelpers.ParseQueryOptions(filterPairs);
             var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
             var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
             var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
