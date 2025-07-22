@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ServiceNow.Configuration;
-using ServiceNow.Extensions;
+using ServiceNow;
 using ServiceNow.Models;
 
 namespace ServiceNow.Clients;
@@ -29,13 +29,13 @@ public class GroupApiClient {
     /// <summary>
     /// Retrieves a sys_user_group record.
     /// </summary>
-    public Task<SysUserGroup?> GetGroupAsync(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+    public Task<SysUserGroup?> GetGroupAsync(string sysId, TableQueryOptions? filters = null, CancellationToken cancellationToken = default)
         => TableClient.GetRecordAsync<SysUserGroup>("sys_user_group", sysId, filters, cancellationToken);
 
     /// <summary>
     /// Lists sys_user_group records.
     /// </summary>
-    public Task<List<SysUserGroup>> ListGroupsAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
+    public Task<List<SysUserGroup>> ListGroupsAsync(TableQueryOptions? filters = null, CancellationToken cancellationToken = default)
         => TableClient.ListRecordsAsync<SysUserGroup>("sys_user_group", filters, cancellationToken);
 
     /// <summary>

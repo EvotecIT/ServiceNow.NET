@@ -2,7 +2,10 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
 using ServiceNow.Extensions;
+using ServiceNow;
+using ServiceNow.Queries;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,13 +52,13 @@ public class TableApiClientTests {
     }
 
     [Fact]
-    public async Task GetRecordAsync_WithFilters_AppendsQueryString() {
+    public async Task GetRecordAsync_WithOptions_AppendsQueryString() {
         var (client, mock) = Create();
-        var filters = new Dictionary<string, string?> { ["fields"] = "sys_id" };
+        var opts = new TableQueryOptions { Fields = ["sys_id"] };
 
-        await client.GetRecordAsync<TaskRecord>("task", "1", filters, CancellationToken.None);
+        await client.GetRecordAsync<TaskRecord>("task", "1", opts, CancellationToken.None);
 
-        Assert.Equal("/api/now/v2/table/task/1?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/1?sysparm_fields=sys_id", mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -89,16 +92,39 @@ public class TableApiClientTests {
     }
 
     [Fact]
-    public async Task ListRecordsAsync_SendsGetWithFilters() {
+    public async Task ListRecordsAsync_SendsGetWithOptions() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("[]");
-        var filters = new Dictionary<string, string?> { ["state"] = "1" };
+        var opts = new TableQueryOptions { AdditionalParameters = { ["state"] = "1" } };
 
-        var records = await client.ListRecordsAsync<TaskRecord>("task", filters, CancellationToken.None);
+        var records = await client.ListRecordsAsync<TaskRecord>("task", opts, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/v2/table/task?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task?state=1", mock.LastRelativeUrl);
         Assert.NotNull(records);
+    }
+
+    [Fact]
+    public async Task GetRecordAsync_WithMultipleOptions_BuildsQueryString() {
+        var (client, mock) = Create();
+        var opts = new TableQueryOptions {
+            Fields = ["sys_id", "number"],
+            Query = new QueryBuilder().And("active=true"),
+            DisplayValue = "true",
+            ExcludeReferenceLinks = true,
+            AdditionalParameters = { ["foo"] = "bar" }
+        };
+
+        await client.GetRecordAsync<TaskRecord>("task", "1", opts, CancellationToken.None);
+
+        var expectedDict = new Dictionary<string, object?> {
+            ["sysparm_fields"] = new[] { "sys_id", "number" },
+            ["sysparm_query"] = "active=true",
+            ["sysparm_display_value"] = "true",
+            ["sysparm_exclude_reference_link"] = "true",
+            ["foo"] = "bar"
+        };
+        Assert.Equal($"/api/now/v2/table/task/1?{expectedDict.ToQueryString()}", mock.LastRelativeUrl);
     }
 
     [Fact]
