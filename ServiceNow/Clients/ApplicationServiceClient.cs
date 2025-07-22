@@ -3,6 +3,7 @@ using ServiceNow.Configuration;
 using ServiceNow.Models;
 using ServiceNow.Utilities;
 using ServiceNow.Extensions;
+using ServiceNow;
 
 namespace ServiceNow.Clients;
 
@@ -41,8 +42,9 @@ public class ApplicationServiceClient {
     /// </summary>
     /// <param name="filters">Optional query filters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<List<ApplicationService>> ListServicesAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default) {
-        var query = filters is { Count: > 0 } ? $"?{filters.ToQueryString()}" : string.Empty;
+    public async Task<List<ApplicationService>> ListServicesAsync(TableQueryOptions? options = null, CancellationToken cancellationToken = default) {
+        var qs = options is not null ? options.ToQueryString() : string.Empty;
+        var query = string.IsNullOrEmpty(qs) ? string.Empty : $"?{qs}";
         var path = string.Format(ServiceNowApiPaths.ApplicationService, _settings.ApiVersion);
         var response = await _client.GetAsync($"{path}{query}", cancellationToken).ConfigureAwait(false);
         await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);

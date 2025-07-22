@@ -4,6 +4,7 @@ using ServiceNow.Models;
 using System.Net;
 using System.Net.Http;
 
+using ServiceNow;
 using System.Linq;
 using ServiceNow.Extensions;
 namespace ServiceNow.Tests;
@@ -34,12 +35,12 @@ public class ApplicationServiceClientTests {
     public async Task ListServicesAsync_SendsGetWithFilters() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("[]");
-        var filters = new Dictionary<string, string?> { ["name"] = "svc" };
+        var options = new TableQueryOptions { Query = "name=svc" };
 
-        var list = await client.ListServicesAsync(filters, CancellationToken.None);
+        var list = await client.ListServicesAsync(options, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/v2/table/cmdb_ci_service?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/cmdb_ci_service?" + options.ToQueryString(), mock.LastRelativeUrl);
         Assert.NotNull(list);
     }
 

@@ -3,6 +3,7 @@ using ServiceNow.Configuration;
 using ServiceNow.Models;
 using ServiceNow.Extensions;
 using System.Net;
+using ServiceNow;
 using System.Net.Http;
 
 namespace ServiceNow.Tests;
@@ -33,12 +34,12 @@ public class RoleApiClientTests {
     public async Task ListRolesAsync_SendsGetWithFilters() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("[]");
-        var filters = new Dictionary<string, string?> { ["name"] = "admin" };
+        var options = new TableQueryOptions { Query = "name=admin" };
 
-        var list = await client.ListRolesAsync(filters, CancellationToken.None);
+        var list = await client.ListRolesAsync(options, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/v1/table/sys_user_role?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v1/table/sys_user_role?" + options.ToQueryString(), mock.LastRelativeUrl);
         Assert.NotNull(list);
     }
 }

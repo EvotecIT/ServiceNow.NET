@@ -1,5 +1,6 @@
 using ServiceNow.Clients;
 using System.Collections.Generic;
+using ServiceNow;
 
 namespace ServiceNow.Fluent;
 
@@ -31,16 +32,16 @@ public class FluentTableApi<TRecord> {
     /// <param name="sysId">Record sys_id.</param>
     /// <param name="filters">Optional query filters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<TRecord?> GetAsync(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => await _client.GetRecordAsync<TRecord>(_table, sysId, filters, cancellationToken).ConfigureAwait(false);
+    public async Task<TRecord?> GetAsync(string sysId, TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => await _client.GetRecordAsync<TRecord>(_table, sysId, options, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Lists records from the table.
     /// </summary>
     /// <param name="filters">Optional query filters.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task<List<TRecord>> ListAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => await _client.ListRecordsAsync<TRecord>(_table, filters, cancellationToken).ConfigureAwait(false);
+    public async Task<List<TRecord>> ListAsync(TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => await _client.ListRecordsAsync<TRecord>(_table, options, cancellationToken).ConfigureAwait(false);
 
     /// <summary>
     /// Creates a record in the table.

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ServiceNow.Configuration;
 using ServiceNow.Extensions;
 using ServiceNow.Models;
+using ServiceNow;
 
 namespace ServiceNow.Clients;
 
@@ -29,14 +30,14 @@ public class UserApiClient {
     /// <summary>
     /// Retrieves a sys_user record.
     /// </summary>
-    public Task<SysUser?> GetUserAsync(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => TableClient.GetRecordAsync<SysUser>("sys_user", sysId, filters, cancellationToken);
+    public Task<SysUser?> GetUserAsync(string sysId, TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => TableClient.GetRecordAsync<SysUser>("sys_user", sysId, options, cancellationToken);
 
     /// <summary>
     /// Lists sys_user records.
     /// </summary>
-    public Task<List<SysUser>> ListUsersAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => TableClient.ListRecordsAsync<SysUser>("sys_user", filters, cancellationToken);
+    public Task<List<SysUser>> ListUsersAsync(TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => TableClient.ListRecordsAsync<SysUser>("sys_user", options, cancellationToken);
 
     /// <summary>
     /// Creates a sys_user record.
@@ -59,14 +60,14 @@ public class UserApiClient {
     /// <summary>
     /// Retrieves a sys_user_group record.
     /// </summary>
-    public Task<SysUserGroup?> GetGroupAsync(string sysId, Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => TableClient.GetRecordAsync<SysUserGroup>("sys_user_group", sysId, filters, cancellationToken);
+    public Task<SysUserGroup?> GetGroupAsync(string sysId, TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => TableClient.GetRecordAsync<SysUserGroup>("sys_user_group", sysId, options, cancellationToken);
 
     /// <summary>
     /// Lists sys_user_group records.
     /// </summary>
-    public Task<List<SysUserGroup>> ListGroupsAsync(Dictionary<string, string?>? filters = null, CancellationToken cancellationToken = default)
-        => TableClient.ListRecordsAsync<SysUserGroup>("sys_user_group", filters, cancellationToken);
+    public Task<List<SysUserGroup>> ListGroupsAsync(TableQueryOptions? options = null, CancellationToken cancellationToken = default)
+        => TableClient.ListRecordsAsync<SysUserGroup>("sys_user_group", options, cancellationToken);
 
     /// <summary>
     /// Creates a sys_user_group record.

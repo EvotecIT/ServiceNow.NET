@@ -4,6 +4,7 @@ using ServiceNow.Models;
 using ServiceNow.Extensions;
 using System;
 using System.Net;
+using ServiceNow;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
@@ -51,11 +52,11 @@ public class TableApiClientTests {
     [Fact]
     public async Task GetRecordAsync_WithFilters_AppendsQueryString() {
         var (client, mock) = Create();
-        var filters = new Dictionary<string, string?> { ["fields"] = "sys_id" };
+        var options = new TableQueryOptions { Fields = "sys_id" };
 
-        await client.GetRecordAsync<TaskRecord>("task", "1", filters, CancellationToken.None);
+        await client.GetRecordAsync<TaskRecord>("task", "1", options, CancellationToken.None);
 
-        Assert.Equal("/api/now/v2/table/task/1?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task/1?" + options.ToQueryString(), mock.LastRelativeUrl);
     }
 
     [Fact]
@@ -92,12 +93,12 @@ public class TableApiClientTests {
     public async Task ListRecordsAsync_SendsGetWithFilters() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("[]");
-        var filters = new Dictionary<string, string?> { ["state"] = "1" };
+        var options = new TableQueryOptions { Query = "state=1" };
 
-        var records = await client.ListRecordsAsync<TaskRecord>("task", filters, CancellationToken.None);
+        var records = await client.ListRecordsAsync<TaskRecord>("task", options, CancellationToken.None);
 
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
-        Assert.Equal("/api/now/v2/table/task?" + filters.ToQueryString(), mock.LastRelativeUrl);
+        Assert.Equal("/api/now/v2/table/task?" + options.ToQueryString(), mock.LastRelativeUrl);
         Assert.NotNull(records);
     }
 
