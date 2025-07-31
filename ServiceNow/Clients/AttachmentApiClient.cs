@@ -1,8 +1,10 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using ServiceNow.Configuration;
 using ServiceNow.Extensions;
+using ServiceNow.Utilities;
 
 namespace ServiceNow.Clients;
 
@@ -30,6 +32,20 @@ public class AttachmentApiClient {
     /// <param name="cancellationToken">Cancellation token.</param>
     public async Task<HttpResponseMessage> GetAttachmentAsync(string sysId, CancellationToken cancellationToken = default)
         => await _client.GetAsync(string.Format(ServiceNowApiPaths.Attachment, _settings.ApiVersion, sysId), cancellationToken).ConfigureAwait(false);
+
+    /// <summary>
+    /// Searches attachments for a record.
+    /// </summary>
+    /// <param name="table">Table name.</param>
+    /// <param name="sysId">Record sys_id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public async Task<List<T>> SearchAttachmentsAsync<T>(string table, string sysId, CancellationToken cancellationToken = default) {
+        var path = string.Format(ServiceNowApiPaths.AttachmentSearch, _settings.ApiVersion, table, sysId);
+        var response = await _client.GetAsync(path, cancellationToken).ConfigureAwait(false);
+        await response.EnsureServiceNowSuccessAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        return JsonSerializer.Deserialize<List<T>>(json, ServiceNowJson.Default) ?? new();
+    }
 
     /// <summary>
     /// Uploads an attachment to a record.

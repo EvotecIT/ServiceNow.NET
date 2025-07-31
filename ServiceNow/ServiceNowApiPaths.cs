@@ -17,6 +17,11 @@ public static class ServiceNowApiPaths {
     public const string AttachmentFile = "/api/now/{0}/attachment/file?table_name={1}&table_sys_id={2}";
 
     /// <summary>
+    /// Format string for searching attachments by record.
+    /// </summary>
+    public const string AttachmentSearch = "/api/now/{0}/attachment?table_name={1}&table_sys_id={2}";
+
+    /// <summary>
     /// Format string for table record operations.
     /// </summary>
     public const string TableRecord = "/api/now/{0}/table/{1}/{2}";

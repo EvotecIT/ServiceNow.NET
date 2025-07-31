@@ -68,6 +68,16 @@ Console.WriteLine(JsonSerializer.Serialize(
     plan,
     new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
 
+Console.WriteLine("Listing incident attachments...");
+var attachmentClient = provider.GetRequiredService<AttachmentApiClient>();
+var attachments = await attachmentClient.SearchAttachmentsAsync<AttachmentMetadata>(
+    "incident",
+    "example_sys_id",
+    CancellationToken.None);
+Console.WriteLine(JsonSerializer.Serialize(
+    attachments,
+    new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+
 Console.WriteLine("Serializing catalog approval...");
 var approvalSample = new CatalogApproval { State = CatalogApprovalState.Approved };
 Console.WriteLine(JsonSerializer.Serialize(
