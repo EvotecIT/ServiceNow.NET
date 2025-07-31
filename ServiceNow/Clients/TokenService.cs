@@ -103,7 +103,14 @@ public class TokenService {
             _settings.RefreshToken = rt.GetString();
         }
         if (doc.RootElement.TryGetProperty("expires_in", out var exp)) {
-            var seconds = exp.GetInt32();
+            int seconds;
+            if (exp.ValueKind == JsonValueKind.Number && exp.TryGetInt32(out var num)) {
+                seconds = num;
+            } else if (exp.ValueKind == JsonValueKind.String && int.TryParse(exp.GetString(), out var parsed)) {
+                seconds = parsed;
+            } else {
+                seconds = 3600;
+            }
             _settings.TokenExpires = DateTimeOffset.UtcNow.AddSeconds(seconds);
         } else {
             _settings.TokenExpires = DateTimeOffset.UtcNow.AddHours(1);
