@@ -32,6 +32,15 @@ public class WorkflowApiClientTests {
     }
 
     [Fact]
+    public async Task StartExecutionAsync_EncodesWorkflowId() {
+        var (client, mock) = Create();
+
+        await client.StartExecutionAsync("wf/1 2", new { }, CancellationToken.None);
+
+        Assert.Equal("/api/now/v2/workflow/wf%2F1%202/start", mock.LastRelativeUrl);
+    }
+
+    [Fact]
     public async Task GetExecutionStatusAsync_SendsGetAndReturnsStatus() {
         var (client, mock) = Create();
         mock.Response.Content = new StringContent("{\"result\":{\"status\":\"complete\"}}");
@@ -41,6 +50,17 @@ public class WorkflowApiClientTests {
         Assert.Equal(HttpMethod.Get, mock.LastMethod);
         Assert.Equal("/api/now/v2/workflow/execution/e1", mock.LastRelativeUrl);
         Assert.Equal("complete", status);
+    }
+
+    [Fact]
+    public async Task GetExecutionStatusAsync_EncodesExecutionId() {
+        var (client, mock) = Create();
+        mock.Response.Content = new StringContent("{\"result\":{\"status\":\"running\"}}");
+
+        var status = await client.GetExecutionStatusAsync("e/1 2", CancellationToken.None);
+
+        Assert.Equal("/api/now/v2/workflow/execution/e%2F1%202", mock.LastRelativeUrl);
+        Assert.Equal("running", status);
     }
 
     [Fact]
