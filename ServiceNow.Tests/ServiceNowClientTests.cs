@@ -54,6 +54,44 @@ public class ServiceNowClientTests {
         Assert.Contains(client.DefaultRequestHeaders.UserAgent, h => h.Product?.Name == "TestAgent");
     }
 
+    [Fact]
+    public void AddServiceNow_MissingUsername_Throws() {
+        var handler = new MockHttpMessageHandler();
+        var services = new ServiceCollection();
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Password = "pass"
+        };
+
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+
+        var provider = services.BuildServiceProvider();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+
+        Assert.Throws<ArgumentException>(() => factory.CreateClient(ServiceNowClient.HttpClientName));
+    }
+
+    [Fact]
+    public void AddServiceNow_MissingPassword_Throws() {
+        var handler = new MockHttpMessageHandler();
+        var services = new ServiceCollection();
+        var settings = new ServiceNowSettings {
+            BaseUrl = "https://example.com",
+            Username = "user"
+        };
+
+        services.AddServiceNow(settings);
+        services.AddHttpClient(ServiceNowClient.HttpClientName)
+            .ConfigurePrimaryHttpMessageHandler(() => handler);
+
+        var provider = services.BuildServiceProvider();
+        var factory = provider.GetRequiredService<IHttpClientFactory>();
+
+        Assert.Throws<ArgumentException>(() => factory.CreateClient(ServiceNowClient.HttpClientName));
+    }
+
 
     [Fact]
     public void Constructor_NullBaseUrl_Throws() {
