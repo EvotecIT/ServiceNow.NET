@@ -2,6 +2,7 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using ServiceNow.Utilities;
@@ -39,7 +40,18 @@ internal sealed class CreateRecordCommand : Command
             var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
             using var provider = CommandHelpers.BuildProvider(settings);
             var tableClient = provider.GetRequiredService<TableApiClient>();
-            var record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
+            Dictionary<string, string?> record;
+            try
+            {
+                record = JsonSerializer.Deserialize<Dictionary<string, string?>>(data, ServiceNowJson.Default) ?? new();
+            }
+            catch (JsonException ex)
+            {
+                StandardStreamWriter.WriteLine(ctx.Console.Error, $"Invalid JSON payload: {ex.Message}");
+                ctx.ExitCode = 1;
+                return;
+            }
+
             await tableClient.CreateRecordAsync(table, record, cancellationToken).ConfigureAwait(false);
             Console.WriteLine("Record created.");
         });
