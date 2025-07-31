@@ -27,6 +27,16 @@ public static class ServiceCollectionExtensions {
             client.Timeout = opts.Timeout;
             if (!opts.UseOAuth)
             {
+                if (string.IsNullOrEmpty(opts.Username))
+                {
+                    throw new ArgumentException("Username is required when not using OAuth.", nameof(ServiceNowSettings.Username));
+                }
+
+                if (string.IsNullOrEmpty(opts.Password))
+                {
+                    throw new ArgumentException("Password is required when not using OAuth.", nameof(ServiceNowSettings.Password));
+                }
+
                 var authBytes = Encoding.ASCII.GetBytes($"{opts.Username}:{opts.Password}");
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));
