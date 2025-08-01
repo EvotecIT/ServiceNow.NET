@@ -34,4 +34,31 @@ public class QueryBuilderTests {
             "opened_at>=2024-01-01 00:00:00^opened_at<=2024-01-31 23:59:59",
             qb.ToQueryString());
     }
+
+    [Fact]
+    public void BuildQuery_Equals_GeneratesEqualityCondition() {
+        var qb = new QueryBuilder().Equals("state", 1);
+
+        Assert.Equal("state=1", qb.ToQueryString());
+    }
+
+    [Fact]
+    public void BuildQuery_Contains_GeneratesLikeCondition() {
+        var qb = new QueryBuilder().Contains("short_description", "error");
+
+        Assert.Equal("short_descriptionLIKEerror", qb.ToQueryString());
+    }
+
+    [Fact]
+    public void BuildQuery_Between_GeneratesBetweenCondition() {
+        var qb = new QueryBuilder()
+            .Between(
+                "opened_at",
+                new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2024, 1, 2, 23, 59, 59, TimeSpan.Zero));
+
+        Assert.Equal(
+            "opened_atBETWEEN2024-01-01 00:00:00@2024-01-02 23:59:59",
+            qb.ToQueryString());
+    }
 }

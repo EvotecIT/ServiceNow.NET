@@ -39,6 +39,31 @@ public sealed class QueryBuilder {
         => And($"{field}<={date:yyyy-MM-dd HH:mm:ss}");
 
     /// <summary>
+    /// Adds a condition requiring <paramref name="field"/> to equal the specified value.
+    /// </summary>
+    /// <param name="field">Field name.</param>
+    /// <param name="value">Value to compare.</param>
+    public QueryBuilder Equals(string field, object value)
+        => And($"{field}={value}");
+
+    /// <summary>
+    /// Adds a condition requiring <paramref name="field"/> to contain the specified value.
+    /// </summary>
+    /// <param name="field">Field name.</param>
+    /// <param name="value">Substring to search for.</param>
+    public QueryBuilder Contains(string field, string value)
+        => And($"{field}LIKE{value}");
+
+    /// <summary>
+    /// Adds a condition requiring <paramref name="field"/> to be between the specified dates.
+    /// </summary>
+    /// <param name="field">Field name.</param>
+    /// <param name="start">Start date.</param>
+    /// <param name="end">End date.</param>
+    public QueryBuilder Between(string field, DateTimeOffset start, DateTimeOffset end)
+        => And($"{field}BETWEEN{start:yyyy-MM-dd HH:mm:ss}@{end:yyyy-MM-dd HH:mm:ss}");
+
+    /// <summary>
     /// Adds a condition preceded by the '^OR' operator.
     /// </summary>
     /// <param name="condition">Query condition.</param>
