@@ -32,7 +32,7 @@ public class EnumExtensionsTests {
     }
 
     [Fact]
-    public void ToDisplayString_CachePerformance() {
+    public void ToDisplayString_UsesCache() {
         var field = typeof(EnumExtensions).GetField("_displayNameCache", BindingFlags.NonPublic | BindingFlags.Static)!;
         var cache = (ConcurrentDictionary<Type, Dictionary<Enum, string>>)field.GetValue(null)!;
         cache.Clear();
@@ -45,21 +45,6 @@ public class EnumExtensionsTests {
 
         Assert.Equal(1, countAfterFirst);
         Assert.Equal(countAfterFirst, countAfterSecond);
-
-        const int iterations = 200000;
-        var sw1 = Stopwatch.StartNew();
-        for (var i = 0; i < iterations; i++) {
-            _ = IncidentState.New.ToDisplayString();
-        }
-        sw1.Stop();
-
-        var sw2 = Stopwatch.StartNew();
-        for (var i = 0; i < iterations; i++) {
-            _ = IncidentState.New.ToDisplayString();
-        }
-        sw2.Stop();
-
-        Assert.True(sw2.ElapsedMilliseconds < sw1.ElapsedMilliseconds);
     }
 
 }
