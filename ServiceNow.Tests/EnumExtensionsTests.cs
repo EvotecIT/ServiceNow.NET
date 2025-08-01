@@ -1,3 +1,7 @@
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using ServiceNow.Enums;
 using ServiceNow.Extensions;
 using Xunit;
@@ -26,4 +30,21 @@ public class EnumExtensionsTests {
         var result = role.ToDisplayString();
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void ToDisplayString_UsesCache() {
+        var field = typeof(EnumExtensions).GetField("_displayNameCache", BindingFlags.NonPublic | BindingFlags.Static)!;
+        var cache = (ConcurrentDictionary<Type, Dictionary<Enum, string>>)field.GetValue(null)!;
+        cache.Clear();
+
+        _ = IncidentState.New.ToDisplayString();
+        var countAfterFirst = cache.Count;
+
+        _ = IncidentState.Resolved.ToDisplayString();
+        var countAfterSecond = cache.Count;
+
+        Assert.Equal(1, countAfterFirst);
+        Assert.Equal(countAfterFirst, countAfterSecond);
+    }
+
 }
