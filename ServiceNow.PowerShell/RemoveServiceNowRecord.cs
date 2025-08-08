@@ -6,45 +6,68 @@ using System.Management.Automation;
 
 namespace ServiceNow.PowerShell;
 
-[Cmdlet(VerbsCommon.Remove, "ServiceNowRecord")]
 /// <summary>
-/// PowerShell cmdlet for removing a ServiceNow record.
+/// Deletes a record from a ServiceNow table.
 /// </summary>
+/// <remarks>
+/// <para>Calls the ServiceNow Table API to remove the specified record.</para>
+/// <list type="alertSet">
+/// <item>
+/// <term>Note</term>
+/// <description>Deletion is permanent and cannot be undone.</description>
+/// </item>
+/// </list>
+/// </remarks>
+/// <example>
+/// <summary>Remove an incident.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Remove-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "incident" -SysId "abc123"</code>
+/// <para>Deletes the specified incident after confirmation.</para>
+/// </example>
+/// <example>
+/// <summary>Force removal.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Remove-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "incident" -SysId "abc123" -Force</code>
+/// <para>Deletes the incident without prompting for confirmation.</para>
+/// </example>
+/// <seealso href="https://learn.microsoft.com/powershell/">PowerShell Documentation</seealso>
+/// <seealso href="https://github.com/ServiceNowNET/ServiceNow.NET">Project documentation</seealso>
+[Cmdlet(VerbsCommon.Remove, "ServiceNowRecord")]
 public class RemoveServiceNowRecord : PSCmdlet {
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Base URL of the ServiceNow instance.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Username used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Username { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Password used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Password { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Name of the table containing the record.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Table { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Sys_id of the record to remove.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string SysId { get; set; } = string.Empty;
 
-    [Parameter]
     /// <summary>
     /// Suppress confirmation prompts when deleting.
     /// </summary>
+    [Parameter]
     public SwitchParameter Force { get; set; }
 
     /// <summary>

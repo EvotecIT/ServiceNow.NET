@@ -9,38 +9,61 @@ using System.Text.Json;
 namespace ServiceNow.PowerShell;
 
 /// <summary>
-/// PowerShell cmdlet for retrieving a single ServiceNow record.
+/// Retrieves a single ServiceNow record by its identifier.
 /// </summary>
+/// <remarks>
+/// <para>Fetches the record from the specified table using the ServiceNow Table API.</para>
+/// <list type="alertSet">
+/// <item>
+/// <term>Note</term>
+/// <description>Returned objects may contain null values for fields not populated in ServiceNow.</description>
+/// </item>
+/// </list>
+/// </remarks>
+/// <example>
+/// <summary>Get an incident record.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Get-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "incident" -SysId "abc123"</code>
+/// <para>Retrieves the incident with the specified sys_id.</para>
+/// </example>
+/// <example>
+/// <summary>Get a change request.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>Get-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "change_request" -SysId "def456"</code>
+/// <para>Outputs the change request record for inspection.</para>
+/// </example>
+/// <seealso href="https://learn.microsoft.com/powershell/">PowerShell Documentation</seealso>
+/// <seealso href="https://github.com/ServiceNowNET/ServiceNow.NET">Project documentation</seealso>
 [Cmdlet(VerbsCommon.Get, "ServiceNowRecord")]
 public class GetServiceNowRecord : PSCmdlet {
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Base URL of the ServiceNow instance.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Username used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Username { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Password used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Password { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Name of the table containing the record.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Table { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Sys_id of the record to retrieve.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string SysId { get; set; } = string.Empty;
 
     /// <summary>
