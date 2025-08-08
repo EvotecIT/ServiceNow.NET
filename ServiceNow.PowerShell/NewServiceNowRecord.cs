@@ -9,38 +9,61 @@ using ServiceNow.Utilities;
 namespace ServiceNow.PowerShell;
 
 /// <summary>
-/// PowerShell cmdlet for creating a ServiceNow record.
+/// Creates a new record in a ServiceNow table.
 /// </summary>
+/// <remarks>
+/// <para>Sends a JSON payload to the ServiceNow Table API to create the record.</para>
+/// <list type="alertSet">
+/// <item>
+/// <term>Note</term>
+/// <description>Creating records can trigger business rules or workflows on the ServiceNow instance.</description>
+/// </item>
+/// </list>
+/// </remarks>
+/// <example>
+/// <summary>Create an incident.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>New-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "incident" -Data '{"short_description":"Test"}'</code>
+/// <para>Creates an incident with a short description.</para>
+/// </example>
+/// <example>
+/// <summary>Create a problem record.</summary>
+/// <prefix>PS&gt; </prefix>
+/// <code>New-ServiceNowRecord -BaseUrl "https://instance.service-now.com" -Username "user" -Password "pass" -Table "problem" -Data '{"short_description":"Example"}'</code>
+/// <para>Submits a problem record to the ServiceNow instance.</para>
+/// </example>
+/// <seealso href="https://learn.microsoft.com/powershell/">PowerShell Documentation</seealso>
+/// <seealso href="https://github.com/ServiceNowNET/ServiceNow.NET">Project documentation</seealso>
 [Cmdlet(VerbsCommon.New, "ServiceNowRecord")]
 public class NewServiceNowRecord : PSCmdlet {
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Base URL of the ServiceNow instance.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string BaseUrl { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Username used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Username { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Password used for authentication.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Password { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// Name of the table in which to create the record.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Table { get; set; } = string.Empty;
 
-    [Parameter(Mandatory = true)]
     /// <summary>
     /// JSON payload describing the record to create.
     /// </summary>
+    [Parameter(Mandatory = true)]
     public string Data { get; set; } = string.Empty;
 
     /// <summary>
