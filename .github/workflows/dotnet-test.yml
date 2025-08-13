@@ -70,6 +70,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Install Mono
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mono-complete
+
       - name: Restore dependencies
         run: dotnet restore ServiceNow.NET.sln
 
@@ -107,6 +112,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Mono
+        run: brew install mono
 
       - name: Restore dependencies
         run: dotnet restore ServiceNow.NET.sln
