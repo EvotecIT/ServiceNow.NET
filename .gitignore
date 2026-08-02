@@ -7,3 +7,4 @@ TestResults/
 # Tools
 /dotnet-install.sh
 /packages-microsoft-prod.deb
+/Module/Artefacts/
