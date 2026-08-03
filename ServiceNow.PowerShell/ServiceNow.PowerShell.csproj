@@ -16,6 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <None Include="../Module/en-US/ServiceNow.PowerShell-help.xml"
+          Link="en-US/ServiceNow.PowerShell.dll-Help.xml"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
