@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <XmlDoc2CmdletDocArguments>-strict</XmlDoc2CmdletDocArguments>
     <GenerateAssemblyInfo Condition="'$(TargetFramework)' == 'net472'">false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute Condition="'$(TargetFramework)' == 'net472'">false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
@@ -16,8 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MatejKafka.XmlDoc2CmdletDoc" Version="0.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <None Include="../Module/en-US/ServiceNow.PowerShell-help.xml"
+          Link="en-US/ServiceNow.PowerShell.dll-Help.xml"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
