@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
     <None Include="../Module/en-US/ServiceNow.PowerShell-help.xml"
           Link="en-US/ServiceNow.PowerShell.dll-Help.xml"
           CopyToOutputDirectory="PreserveNewest"
@@ -26,7 +26,7 @@
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.6.4" />
   </ItemGroup>
 
 </Project>
