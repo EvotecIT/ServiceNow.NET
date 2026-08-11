@@ -1,8 +1,6 @@
 using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.CommandLine.IO;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using ServiceNow.Utilities;
@@ -20,25 +18,24 @@ internal sealed class UpdateRecordCommand : Command
         Option<string> apiVersionOption)
         : base("update-record", "Update a record")
     {
-        var tableArg = new Argument<string>("table", "Table name");
-        var sysIdArg = new Argument<string>("sysId", "Record sys_id");
-        var dataOpt = new Option<string>("--data", "JSON payload") { IsRequired = true };
+        var tableArg = new Argument<string>("table") { Description = "Table name" };
+        var sysIdArg = new Argument<string>("sysId") { Description = "Record sys_id" };
+        var dataOpt = new Option<string>("--data") { Description = "JSON payload", Required = true };
 
-        AddArgument(tableArg);
-        AddArgument(sysIdArg);
-        AddOption(dataOpt);
+        Arguments.Add(tableArg);
+        Arguments.Add(sysIdArg);
+        Options.Add(dataOpt);
 
-        this.SetHandler(async ctx =>
+        SetAction(async (parseResult, cancellationToken) =>
         {
-            var table = ctx.ParseResult.GetValueForArgument(tableArg);
-            var sysId = ctx.ParseResult.GetValueForArgument(sysIdArg);
-            var data = ctx.ParseResult.GetValueForOption(dataOpt)!;
-            var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
-            var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
-            var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
-            var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
-            var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
-            var cancellationToken = ctx.GetCancellationToken();
+            var table = parseResult.GetRequiredValue(tableArg);
+            var sysId = parseResult.GetRequiredValue(sysIdArg);
+            var data = parseResult.GetRequiredValue(dataOpt);
+            var baseUrl = parseResult.GetRequiredValue(baseUrlOption);
+            var username = parseResult.GetRequiredValue(usernameOption);
+            var password = parseResult.GetRequiredValue(passwordOption);
+            var userAgent = parseResult.GetRequiredValue(userAgentOption);
+            var apiVersion = parseResult.GetRequiredValue(apiVersionOption);
 
             var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
             using var provider = CommandHelpers.BuildProvider(settings);
@@ -51,13 +48,13 @@ internal sealed class UpdateRecordCommand : Command
             }
             catch (JsonException ex)
             {
-                StandardStreamWriter.WriteLine(ctx.Console.Error, $"Invalid JSON payload: {ex.Message}");
-                ctx.ExitCode = 1;
-                return;
+                Console.Error.WriteLine($"Invalid JSON payload: {ex.Message}");
+                return 1;
             }
 
             await tableClient.UpdateRecordAsync(table, sysId, record, cancellationToken).ConfigureAwait(false);
             Console.WriteLine("Record updated.");
+            return 0;
         });
     }
 }
