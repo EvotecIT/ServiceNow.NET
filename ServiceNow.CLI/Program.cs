@@ -1,23 +1,23 @@
 using System.CommandLine;
 using ServiceNow.CLI.Commands;
 
-var baseUrlOption = new Option<string>("--base-url", description: "ServiceNow instance base URL") { IsRequired = true };
-var usernameOption = new Option<string>("--username", description: "Username") { IsRequired = true };
-var passwordOption = new Option<string>("--password", description: "Password") { IsRequired = true };
-var userAgentOption = new Option<string>("--user-agent", () => "ServiceNow.NET", "User agent") { IsRequired = false };
-var apiVersionOption = new Option<string>("--api-version", () => "v2", "API version") { IsRequired = false };
+var baseUrlOption = new Option<string>("--base-url") { Description = "ServiceNow instance base URL", Required = true, Recursive = true };
+var usernameOption = new Option<string>("--username") { Description = "Username", Required = true, Recursive = true };
+var passwordOption = new Option<string>("--password") { Description = "Password", Required = true, Recursive = true };
+var userAgentOption = new Option<string>("--user-agent") { Description = "User agent", DefaultValueFactory = _ => "ServiceNow.NET", Recursive = true };
+var apiVersionOption = new Option<string>("--api-version") { Description = "API version", DefaultValueFactory = _ => "v2", Recursive = true };
 
 var root = new RootCommand("ServiceNow CLI");
-root.AddGlobalOption(baseUrlOption);
-root.AddGlobalOption(usernameOption);
-root.AddGlobalOption(passwordOption);
-root.AddGlobalOption(userAgentOption);
-root.AddGlobalOption(apiVersionOption);
+root.Options.Add(baseUrlOption);
+root.Options.Add(usernameOption);
+root.Options.Add(passwordOption);
+root.Options.Add(userAgentOption);
+root.Options.Add(apiVersionOption);
 
-root.AddCommand(new GetRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
-root.AddCommand(new CreateRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
-root.AddCommand(new UpdateRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
-root.AddCommand(new ListRecordsCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
-root.AddCommand(new GenerateModelCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption));
+root.Subcommands.Add(new GetRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
+root.Subcommands.Add(new CreateRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
+root.Subcommands.Add(new UpdateRecordCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
+root.Subcommands.Add(new ListRecordsCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption, apiVersionOption));
+root.Subcommands.Add(new GenerateModelCommand(baseUrlOption, usernameOption, passwordOption, userAgentOption));
 
-return await root.InvokeAsync(args);
+return await root.Parse(args).InvokeAsync();

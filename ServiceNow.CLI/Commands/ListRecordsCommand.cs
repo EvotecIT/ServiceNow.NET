@@ -3,7 +3,6 @@ using ServiceNow.Configuration;
 using ServiceNow.Models;
 using ServiceNow;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using ServiceNow.Utilities;
@@ -20,32 +19,33 @@ internal sealed class ListRecordsCommand : Command
         Option<string> apiVersionOption)
         : base("list-records", "List records")
     {
-        var tableArg = new Argument<string>("table", "Table name");
-        var filterOpt = new Option<string[]>("--filter", "Query filters as key=value pairs")
+        var tableArg = new Argument<string>("table") { Description = "Table name" };
+        var filterOpt = new Option<string[]>("--filter")
         {
+            Description = "Query filters as key=value pairs",
             AllowMultipleArgumentsPerToken = true
         };
 
-        AddArgument(tableArg);
-        AddOption(filterOpt);
+        Arguments.Add(tableArg);
+        Options.Add(filterOpt);
 
-        this.SetHandler(async ctx =>
+        SetAction(async (parseResult, cancellationToken) =>
         {
-            var table = ctx.ParseResult.GetValueForArgument(tableArg);
-            var filterPairs = ctx.ParseResult.GetValueForOption(filterOpt) ?? Array.Empty<string>();
+            var table = parseResult.GetRequiredValue(tableArg);
+            var filterPairs = parseResult.GetValue(filterOpt) ?? Array.Empty<string>();
             var options = CommandHelpers.ParseQueryOptions(filterPairs);
-            var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
-            var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
-            var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
-            var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
-            var apiVersion = ctx.ParseResult.GetValueForOption(apiVersionOption)!;
-            var cancellationToken = ctx.GetCancellationToken();
+            var baseUrl = parseResult.GetRequiredValue(baseUrlOption);
+            var username = parseResult.GetRequiredValue(usernameOption);
+            var password = parseResult.GetRequiredValue(passwordOption);
+            var userAgent = parseResult.GetRequiredValue(userAgentOption);
+            var apiVersion = parseResult.GetRequiredValue(apiVersionOption);
 
             var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent, ApiVersion = apiVersion };
             using var provider = CommandHelpers.BuildProvider(settings);
             var tableClient = provider.GetRequiredService<TableApiClient>();
             var records = await tableClient.ListRecordsAsync<TaskRecord>(table, options, cancellationToken).ConfigureAwait(false);
             Console.WriteLine(JsonSerializer.Serialize(records, new JsonSerializerOptions(ServiceNowJson.Default) { WriteIndented = true }));
+            return 0;
         });
     }
 }

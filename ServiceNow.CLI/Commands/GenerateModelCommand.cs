@@ -2,7 +2,6 @@ using ServiceNow.Clients;
 using ServiceNow.Configuration;
 using ServiceNow.Models;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 
@@ -17,21 +16,20 @@ internal sealed class GenerateModelCommand : Command
         Option<string> userAgentOption)
         : base("generate-model", "Generate C# model for a table")
     {
-        var tableArg = new Argument<string>("table", "Table name");
-        var outputOpt = new Option<string>("--output", "Output file") { IsRequired = true };
+        var tableArg = new Argument<string>("table") { Description = "Table name" };
+        var outputOpt = new Option<string>("--output") { Description = "Output file", Required = true };
 
-        AddArgument(tableArg);
-        AddOption(outputOpt);
+        Arguments.Add(tableArg);
+        Options.Add(outputOpt);
 
-        this.SetHandler(async ctx =>
+        SetAction(async (parseResult, cancellationToken) =>
         {
-            var table = ctx.ParseResult.GetValueForArgument(tableArg);
-            var output = ctx.ParseResult.GetValueForOption(outputOpt)!;
-            var baseUrl = ctx.ParseResult.GetValueForOption(baseUrlOption)!;
-            var username = ctx.ParseResult.GetValueForOption(usernameOption)!;
-            var password = ctx.ParseResult.GetValueForOption(passwordOption)!;
-            var userAgent = ctx.ParseResult.GetValueForOption(userAgentOption)!;
-            var cancellationToken = ctx.GetCancellationToken();
+            var table = parseResult.GetRequiredValue(tableArg);
+            var output = parseResult.GetRequiredValue(outputOpt);
+            var baseUrl = parseResult.GetRequiredValue(baseUrlOption);
+            var username = parseResult.GetRequiredValue(usernameOption);
+            var password = parseResult.GetRequiredValue(passwordOption);
+            var userAgent = parseResult.GetRequiredValue(userAgentOption);
 
             var settings = new ServiceNowSettings { BaseUrl = baseUrl, Username = username, Password = password, UserAgent = userAgent };
             using var provider = CommandHelpers.BuildProvider(settings);
@@ -40,6 +38,7 @@ internal sealed class GenerateModelCommand : Command
             var code = CommandHelpers.GenerateClass(metadata);
             File.WriteAllText(output, code);
             Console.WriteLine($"Model written to {output}");
+            return 0;
         });
     }
 }
