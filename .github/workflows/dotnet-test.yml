@@ -113,9 +113,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install Mono
-        run: brew install mono
-
       - name: Restore dependencies
         run: dotnet restore ServiceNow.NET.sln
 
@@ -123,9 +120,10 @@ jobs:
         run: dotnet build ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
 
       - name: Run tests
-        run: >-
-          dotnet test ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
-          --logger trx --collect:"XPlat Code Coverage"
+        run: |
+          dotnet test ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --framework net8.0 --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+          dotnet test ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --framework net9.0 --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+          dotnet test ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --framework net10.0 --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -140,4 +138,3 @@ jobs:
         with:
           name: coverage-reports-macos
           path: '**/coverage.cobertura.xml'
-
