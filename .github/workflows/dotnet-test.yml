@@ -70,21 +70,19 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install Mono
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mono-complete
-
       - name: Restore dependencies
         run: dotnet restore ServiceNow.NET.sln
 
       - name: Build solution
         run: dotnet build ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
 
+      # VSTest runs .NET Framework tests on Windows. The Linux build still compiles every target.
       - name: Run tests
-        run: >-
-          dotnet test ServiceNow.NET.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
-          --logger trx --collect:"XPlat Code Coverage"
+        shell: bash
+        run: |
+          for framework in net8.0 net9.0 net10.0; do
+            dotnet test ServiceNow.NET.sln --configuration "$BUILD_CONFIGURATION" --framework "$framework" --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+          done
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
